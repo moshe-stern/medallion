@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@api/medallion-api": "file:.api/apis/medallion-api",
+    "uuid": "^11.0.3"
+  }
+}
