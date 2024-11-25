@@ -1,6 +1,4 @@
-import medallionApi from '@api/medallion-api';
-
-
+import medallionApi from '@api/medallion-api'
 async function medallion() {
   medallionApi.auth('');
   const res = await medallionApi.api_v1_org_providers_list_providers()
