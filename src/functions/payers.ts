@@ -5,7 +5,7 @@ import { ApiV1OrgProvidersListProvidersMetadataParam } from "@api/medallion-api/
 async function handleGetPayers(request: HttpRequest): Promise<HttpResponseInit> {
     const { state } = request.params as unknown as { state: ApiV1OrgProvidersListProvidersMetadataParam['license_state'] } 
     const payers = await getPayers(state)
-    return { body: JSON.stringify(payers), status: 200 }
+    return { body: JSON.stringify(payers) }
 }
 
 app.http('payers', {
