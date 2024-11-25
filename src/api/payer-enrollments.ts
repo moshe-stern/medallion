@@ -1,0 +1,65 @@
+import medallionApi from "@api/medallion-api";
+import {
+  ApiV1OrgPracticesCreatePracticesResponse201,
+  ApiV1OrgProvidersListProvidersMetadataParam,
+  PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam,
+  PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsResponse201,
+} from "@api/medallion-api/types";
+import { FetchResponse } from "api/dist/core";
+
+export async function createEnrollment(
+  payerName: string,
+  practiceNames: string[],
+  state: ApiV1OrgProvidersListProvidersMetadataParam["license_state"],
+) {
+  if (!state) return;
+  const providers = await medallionApi.api_v1_org_providers_list_providers({
+    license_state: state,
+  });
+  const practicePromises: Promise<
+    FetchResponse<201, ApiV1OrgPracticesCreatePracticesResponse201>
+  >[] = [];
+  if (!providers.data.results) return;
+  const promises: Promise<
+    FetchResponse<
+      201,
+      PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsResponse201
+    >
+  >[] = [];
+  for (const provider of providers.data.results) {
+    promises.push(doPromise(provider.id));
+  }
+  const resolved = await Promise.all(promises);
+  return resolved.every((res) => res.res.ok);
+
+  async function doPromise(providerId: string) {
+    const res = await medallionApi.api_v1_org_practices_list_practices({
+      provider: providerId,
+    });
+    const practices = res.data.results;
+    const filteredPractices = practiceNames.filter(
+      (name) => !practices?.map((pract) => pract.name).includes(name),
+    );
+    for (const name of filteredPractices) {
+      const res = medallionApi.api_v1_org_practices_create_practices({ name });
+      practicePromises.push(res);
+    }
+    const addedPractices = await Promise.all(practicePromises);
+    const combinedPractices = [
+      ...addedPractices.map((added) => added.data),
+      ...(practices || []),
+    ];
+    const res2 =
+      medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(
+        {
+          payer_name: payerName,
+          practices: combinedPractices,
+          provider: providerId,
+          is_medallion_owned: true,
+          resourcetype: "NewProviderPayerEnrollmentServiceRequest",
+          state: "AK",
+        },
+      );
+    return res2;
+  }
+}

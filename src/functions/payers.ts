@@ -1,9 +1,4 @@
-import {
-  app,
-  HttpRequest,
-  HttpResponseInit,
-  InvocationContext,
-} from "@azure/functions";
+import { app, HttpRequest, HttpResponseInit } from "@azure/functions";
 import { getPayers } from "../api";
 import { ApiV1OrgProvidersListProvidersMetadataParam } from "@api/medallion-api/types";
 
