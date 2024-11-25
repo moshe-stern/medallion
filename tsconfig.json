@@ -7,8 +7,5 @@
     "sourceMap": true,
     "strict": false,
     "esModuleInterop": true
-  },
-  "exclude": [
-    "./api"
-  ]
+  }
 }
