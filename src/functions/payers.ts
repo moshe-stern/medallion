@@ -15,9 +15,12 @@ async function handleGetPayers(
   };
   try {
     const payers = await getPayers(state);
+    if (!payers) {
+      throw new Error("Failed to get Payors");
+    }
     return { body: JSON.stringify(payers) };
   } catch (error) {
-    return { body: error };
+    return { body: JSON.stringify(error) };
   }
 }
 

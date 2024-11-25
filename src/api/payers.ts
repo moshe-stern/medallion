@@ -7,16 +7,11 @@ import {
 
 export async function getPayers(
   state: ApiV1OrgProvidersListProvidersMetadataParam["license_state"],
-): Promise<
-  {
-    name: string;
-    payerPracticeAddresses: string[];
-    providerCreationDate: string;
-  }[]
-> {
+) {
   const res = await medallionApi.api_v1_org_providers_list_providers({
     license_state: state,
   });
+  if (!res.data.results) return;
   //TODO: filter by region
   const payersArr: {
     res: Promise<
@@ -27,6 +22,7 @@ export async function getPayers(
     >;
     created: string;
   }[] = [];
+
   for (const provider of res.data.results) {
     const res2 =
       medallionApi.p_api_v1_service_requests_payer_enrollments_list_payerEnrollmentServiceRequests(
@@ -52,9 +48,10 @@ function getPayerObjArr(
   >,
   created: string,
 ) {
-  return res.data.results.map((payer) => ({
+  return res.data.results?.map((payer) => ({
+    id: payer.id,
     name: payer.payer_name,
-    payerPracticeAddresses: payer.practices.map((pract) => pract.name),
+    payerPracticeAddresses: payer.practices?.map((pract) => pract.name),
     providerCreationDate: created,
   }));
 }
