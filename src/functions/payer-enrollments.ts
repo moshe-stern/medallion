@@ -24,7 +24,7 @@ async function handlePayerEnrollments(
           if (!enrollments) {
                throw new Error('Failed to create Enrollments')
           }
-          return { body: JSON.stringify(enrollments) }
+          return { status: 201 }
      } catch (error) {
           return {
                body: JSON.stringify({
