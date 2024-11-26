@@ -5,9 +5,10 @@ import {
      ApiV1OrgProvidersListProvidersResponse200,
      PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam,
      PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsResponse201,
+     PApiV1ServiceRequestsPayerEnrollmentsListPayerEnrollmentServiceRequestsResponse200,
 } from '@api/medallion-api/types'
 import { FetchResponse } from 'api/dist/core'
-import { difference, map } from 'lodash'
+import { difference, flatMap, map, some } from 'lodash'
 
 export interface Enrollment {
      payerName: string
@@ -18,16 +19,46 @@ export async function createEnrollments(
      enrollments: Enrollment[],
      state: ApiV1OrgProvidersListProvidersMetadataParam['license_state']
 ) {
+     if (!state?.length) throw Error('No State Provided')
      const providers = await medallionApi.api_v1_org_providers_list_providers({
           license_state: state,
      })
-     if (!providers.data.results || !state?.length) return
+     if (!providers.data.results)
+          throw new Error('Providers not found in State')
+     const existingEnrollmentsPromises: Promise<
+          FetchResponse<
+               200,
+               PApiV1ServiceRequestsPayerEnrollmentsListPayerEnrollmentServiceRequestsResponse200
+          >
+     >[] = []
+     for (const provider of providers.data.results) {
+          const existingEnrollmentsRes =
+               medallionApi.p_api_v1_service_requests_payer_enrollments_list_payerEnrollmentServiceRequests(
+                    {
+                         provider: provider.id,
+                    }
+               )
+          existingEnrollmentsPromises.push(existingEnrollmentsRes)
+     }
+     const resolvedExistingEnrollments = flatMap(
+          (await Promise.all(existingEnrollmentsPromises)).map(
+               (exist) => exist.data.results
+          )
+     )
      const enrollmentPromises: Promise<boolean>[] = []
-     for (const enrollment of enrollments) {
+     const nonExistentEnrollments = difference(
+          enrollments,
+          resolvedExistingEnrollments.map((exist) => ({
+               payerName: exist?.payer_name,
+               practiceNames: exist?.practices?.map((pract) => pract.name),
+          }))
+     ) as Enrollment[]
+     for (const enrollment of nonExistentEnrollments) {
           enrollmentPromises.push(
                createEnrollment(enrollment, state, providers.data.results)
           )
      }
+     if (!enrollmentPromises.length) throw new Error('No Enrollments to Create')
      const resolved = await Promise.all(enrollmentPromises)
      return resolved.every(Boolean)
 }
