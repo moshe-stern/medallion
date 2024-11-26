@@ -1,22 +1,19 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
-import { getPayers } from '../api'
 import { ApiV1OrgProvidersListProvidersMetadataParam } from '@api/medallion-api/types'
-import { createEnrollment } from '../api/payer-enrollments'
+import { createEnrollments, Enrollment } from '../api/payer-enrollments'
+import { flatMap, groupBy } from 'lodash'
 
 async function handlePayerEnrollments(
      request: HttpRequest
 ): Promise<HttpResponseInit> {
      try {
           const data = (await request.json()) as {
-               payerName: string
-               practiceNames: string[]
+               enrollments: Enrollment[]
                state: ApiV1OrgProvidersListProvidersMetadataParam['license_state']
           }
-          const { payerName, practiceNames, state } = data
-          const enrollments = await createEnrollment(
-               payerName,
-               practiceNames,
-               state
+          const enrollments = await createEnrollments(
+               flatMap(groupBy(data.enrollments, 'payorName')),
+               data.state
           )
           if (!enrollments) {
                throw new Error('Failed to create Enrollments')
