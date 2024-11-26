@@ -1,5 +1,4 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
-import { ApiV1OrgProvidersListProvidersMetadataParam } from '@api/medallion-api/types'
 import { createEnrollments, Enrollment } from '../api/payer-enrollments'
 import { flatMap, groupBy, map, mapValues } from 'lodash'
 

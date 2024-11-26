@@ -6,7 +6,6 @@ import {
 import medallionApi from '@api/medallion-api'
 import { difference, filter, includes, map, uniqBy } from 'lodash'
 import { FetchResponse } from 'api/dist/core'
-import { CLIENT_RENEG_LIMIT } from 'tls'
 
 export async function createNonExistentPractices(
      state: string,

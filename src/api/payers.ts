@@ -37,18 +37,3 @@ export async function getPayers(
      )
      return unmappedPractices
 }
-
-function getPayerObjArr(
-     res: FetchResponse<
-          200,
-          PApiV1ServiceRequestsPayerEnrollmentsListPayerEnrollmentServiceRequestsResponse200
-     >,
-     created: string
-) {
-     return res.data.results?.map((payer) => ({
-          id: payer.id,
-          name: payer.payer_name,
-          payerPracticeAddresses: payer.practices?.map((pract) => pract.name),
-          providerCreationDate: created,
-     }))
-}
