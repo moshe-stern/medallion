@@ -13,34 +13,29 @@ export async function getPayers(
      })
      if (!res.data.results) return
      //TODO: filter by region
-     const payersArr: {
-          res: Promise<
-               FetchResponse<
-                    200,
-                    PApiV1ServiceRequestsPayerEnrollmentsListPayerEnrollmentServiceRequestsResponse200
-               >
+     const promises: Promise<
+          FetchResponse<
+               200,
+               PApiV1ServiceRequestsPayerEnrollmentsListPayerEnrollmentServiceRequestsResponse200
           >
-          created: string
-     }[] = []
-
-     for (const provider of res.data.results) {
-          const res2 =
-               medallionApi.p_api_v1_service_requests_payer_enrollments_list_payerEnrollmentServiceRequests(
-                    { provider: provider.id }
-               )
-          payersArr.push({
-               res: res2,
-               created: provider.created,
-          })
-     }
-     const results = await Promise.all(payersArr.map((item) => item.res))
-     const combinedResults = payersArr.map((item, index) => ({
-          created: item.created,
-          res: results[index],
-     }))
-     return combinedResults.flatMap((com) =>
-          getPayerObjArr(com.res, com.created)
+     >[] = res.data.results.map((provider) =>
+          medallionApi.p_api_v1_service_requests_payer_enrollments_list_payerEnrollmentServiceRequests(
+               { provider: provider.id }
+          )
      )
+     const results = await (
+          await Promise.all(promises)
+     ).map((res) => res.data.results)
+     const unmappedPractices = results.flatMap((result) =>
+          (result || []).flatMap((res) =>
+               (res.practices || []).map((practice) => ({
+                    name: res.payer_name,
+                    payerPracticeAddress: practice.name,
+                    id: practice.id,
+               }))
+          )
+     )
+     return unmappedPractices
 }
 
 function getPayerObjArr(

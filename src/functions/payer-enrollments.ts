@@ -9,7 +9,7 @@ async function handlePayerEnrollments(
      try {
           const data = (await request.json()) as {
                enrollments: { Payor: string; ServiceAddress: string }[]
-               state: ApiV1OrgProvidersListProvidersMetadataParam['license_state']
+               state: string
           }
           const mappedEnrollments: Enrollment[] = data.enrollments.map(
                (enroll) => ({
