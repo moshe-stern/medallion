@@ -1,11 +1,11 @@
 {
-  "version": "1.0",
-  "apis": [
-    {
-      "identifier": "medallion-api",
-      "source": "@medallion-api/v3.0#3bk6nlgm3rnuo6o",
-      "integrity": "sha512-vXrYEivDne9qyPB4Pd+dTTMqamkpqK34oI81yOMvpuqqYX++mv6fgEo7+g9a2RODcMVqfzidjR42zWhYy0//gg==",
-      "installerVersion": "6.1.2"
-    }
-  ]
+     "version": "1.0",
+     "apis": [
+          {
+               "identifier": "medallion-api",
+               "source": "@medallion-api/v3.0#3bk6nlgm3rnuo6o",
+               "integrity": "sha512-vXrYEivDne9qyPB4Pd+dTTMqamkpqK34oI81yOMvpuqqYX++mv6fgEo7+g9a2RODcMVqfzidjR42zWhYy0//gg==",
+               "installerVersion": "6.1.2"
+          }
+     ]
 }
