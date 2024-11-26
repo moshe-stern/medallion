@@ -15,7 +15,14 @@ async function handleGetPayers(
           }
           return { body: JSON.stringify(payers) }
      } catch (error) {
-          return { body: JSON.stringify(error) }
+          return {
+               body: JSON.stringify({
+                    error:
+                         (error as Error).message ||
+                         'An unknown error occurred',
+               }),
+               status: 500,
+          }
      }
 }
 

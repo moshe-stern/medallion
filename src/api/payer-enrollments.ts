@@ -19,11 +19,11 @@ export async function createEnrollments(
      enrollments: Enrollment[],
      state: ApiV1OrgProvidersListProvidersMetadataParam['license_state']
 ) {
-     if (!state?.length) throw Error('No State Provided')
+     if (!state?.length) throw new Error('No State Provided')
      const providers = await medallionApi.api_v1_org_providers_list_providers({
           license_state: state,
      })
-     if (!providers.data.results)
+     if (!providers.data.results?.length)
           throw new Error('Providers not found in State')
      const existingEnrollmentsPromises: Promise<
           FetchResponse<

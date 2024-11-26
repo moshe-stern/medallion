@@ -26,7 +26,14 @@ async function handlePayerEnrollments(
           }
           return { body: JSON.stringify(enrollments) }
      } catch (error) {
-          return { body: JSON.stringify(error) }
+          return {
+               body: JSON.stringify({
+                    error:
+                         (error as Error).message ||
+                         'An unknown error occurred',
+               }),
+               status: 500,
+          }
      }
 }
 
