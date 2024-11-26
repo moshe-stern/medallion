@@ -8,11 +8,17 @@ async function handlePayerEnrollments(
 ): Promise<HttpResponseInit> {
      try {
           const data = (await request.json()) as {
-               enrollments: Enrollment[]
+               enrollments: { Payor: string; ServiceAddress: string }[]
                state: ApiV1OrgProvidersListProvidersMetadataParam['license_state']
           }
+          const mappedEnrollments: Enrollment[] = data.enrollments.map(
+               (enroll) => ({
+                    payerName: enroll.Payor,
+                    practiceNames: [enroll.ServiceAddress],
+               })
+          )
           const enrollments = await createEnrollments(
-               flatMap(groupBy(data.enrollments, 'payorName')),
+               flatMap(groupBy(mappedEnrollments, 'payerName')),
                data.state
           )
           if (!enrollments) {
