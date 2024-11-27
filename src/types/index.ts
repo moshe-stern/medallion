@@ -1,4 +1,3 @@
-
 interface Enrollment {
      payerName: string
      practiceNames: string[]

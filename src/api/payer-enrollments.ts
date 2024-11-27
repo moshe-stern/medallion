@@ -5,13 +5,7 @@ import {
      PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam,
 } from '@api/medallion-api/types'
 import { FetchResponse } from 'api/dist/core'
-import {
-     filter,
-     flatMap,
-     includes,
-     isEqual,
-     some,
-} from 'lodash'
+import { filter, flatMap, includes, isEqual, some } from 'lodash'
 import {
      createNonExistentPractices,
      createNonExistentPracticesInProvider,
