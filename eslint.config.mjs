@@ -1,8 +1,7 @@
 import globals from 'globals'
 import pluginJs from '@eslint/js'
 import tseslint from 'typescript-eslint'
-import unusedImports from 'eslint-plugin-unused-imports';
-
+import unusedImports from 'eslint-plugin-unused-imports'
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -13,18 +12,9 @@ export default [
      {
           plugins: {
                'unused-imports': unusedImports,
-           },
-           rules: {
-               'unused-imports/no-unused-imports': 'error', // Automatically removes unused imports
-               'unused-imports/no-unused-vars': [
-                   'warn',
-                   {
-                       vars: 'all',
-                       varsIgnorePattern: '^_',
-                       args: 'after-used',
-                       argsIgnorePattern: '^_',
-                   },
-               ],
-           },
-     }
+          },
+          rules: {
+               'unused-imports/no-unused-imports': 'error', 
+          },
+     },
 ]
