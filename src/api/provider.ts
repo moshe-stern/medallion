@@ -1,13 +1,13 @@
 import medallionApi from '@api/medallion-api'
-import { Provider } from '../types/provider'
 import { Enrollment } from '../types'
 import { ApiV1OrgProvidersListProvidersResponse200 } from '@api/medallion-api/types'
 import { groupBy, filter, every, includes } from 'lodash'
-import { getProvidersByEmails } from '../db/providers'
 import { FetchResponse } from 'api/dist/core'
+import { IProvider, getProvidersByEmail } from 'attain-aba-shared'
 
-async function createProvider(provider: Provider) {
+async function createProvider(provider: IProvider) {
      if (!provider.email || !provider.email) return
+     //TODO add profession need acronyms
      const member =
           await medallionApi.p_api_v1_organizations_members_create_members({
                user: { email: provider.email },
@@ -15,7 +15,7 @@ async function createProvider(provider: Provider) {
           })
      const id = member.data.provider?.id
      if (!id) return
-     medallionApi.api_v1_org_providers_partial_update_providers(
+     await medallionApi.api_v1_org_providers_partial_update_providers(
           { npi: +provider.id },
           { provider_pk: id }
      )
@@ -33,7 +33,7 @@ async function getCoveredProviders(
           ApiV1OrgProvidersListProvidersResponse200
      >['data']['results'] = []
      if (enrollment.coveredRegions) {
-          const dbProviders = await getProvidersByEmails(
+          const dbProviders = await getProvidersByEmail(
                (providers || []).map((prov) => prov.email)
           )
           const grouped = groupBy(dbProviders, 'email')
