@@ -4,66 +4,58 @@
 name: Build and deploy Node.js project to Azure Function App - medallion
 
 on:
-     push:
-          branches:
-               - main
-     workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
-     AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
-     NODE_VERSION: '22.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '22.x' # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
 jobs:
-     build:
-          runs-on: windows-latest
-          steps:
-               - name: 'Checkout GitHub Action'
-                 uses: actions/checkout@v4
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v4
 
-               - name: Setup Node ${{ env.NODE_VERSION }} Environment
-                 uses: actions/setup-node@v3
-                 with:
-                      node-version: ${{ env.NODE_VERSION }}
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-               - name: 'Resolve Project Dependencies Using Npm'
-                 shell: pwsh
-                 run: |
-                      pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-                      npm install
-                      npm run build --if-present
-                      npm run test --if-present
-                      popd
+      - name: 'Resolve Project Dependencies Using Npm'
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+          popd
 
-               - name: Upload artifact for deployment job
-                 uses: actions/upload-artifact@v4
-                 with:
-                      name: node-app
-                      path: .
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: .
 
-     deploy:
-          runs-on: windows-latest
-          needs: build
-
-          permissions:
-               id-token: write #This is required for requesting the JWT
-
-          steps:
-               - name: Download artifact from build job
-                 uses: actions/download-artifact@v4
-                 with:
-                      name: node-app
-
-               - name: Login to Azure
-                 uses: azure/login@v2
-                 with:
-                      client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B9196096FD4F4A38948EB490D3A62ED0 }}
-                      tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_663240027AFF493892F7CB5E56BC2FBD }}
-                      subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B83D73A52C5F4FB5905029B5D1C6DA20 }}
-
-               - name: 'Run Azure Functions Action'
-                 uses: Azure/functions-action@v1
-                 id: fa
-                 with:
-                      app-name: 'medallion'
-                      slot-name: 'Production'
-                      package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+      
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: 'medallion'
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6EAAA31DBC29439FA711F4F97115D791 }}
