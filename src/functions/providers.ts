@@ -1,5 +1,5 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
-import { createProvider, patchProviders } from '../services'
+import { createProvider, getProviders, patchProviders } from '../services'
 import { IProvider } from 'attain-aba-shared'
 
 async function providersHandler(
@@ -19,18 +19,27 @@ async function providersHandler(
                } else {
                     throw new Error('Failed to create Provider')
                }
+          } else if (request.method === 'PATCH') {
+               const providerData = (await request.json()) as {
+                    employeeNumber: string
+                    employeeCode: string
+                    workStatus: string
+                    employeeTitle: string
+                    employeeEmail: string
+               }[]
+               if (!providerData || !providerData.length)
+                    throw new Error('No provider data provided')
+               const res = await patchProviders(providerData)
+               return { body: JSON.stringify(res) }
+          } else {
+               const res = await getProviders()
+               if (!res.res.ok) {
+                    throw new Error('Failed to get Providers')
+               }
+               return { body: JSON.stringify(res.data.results) }
           }
-          const providerData = (await request.json()) as {
-               employeeNumber: string
-               employeeCode: string
-               workStatus: string
-               employeeTitle: string
-               employeeEmail: string
-          }[]
-          if (!providerData || !providerData.length)
-               throw new Error('No provider data provided')
-          const res = await patchProviders(providerData)
-          return { body: JSON.stringify(res) }
+
+
      } catch (error) {
           return {
                body: JSON.stringify({
@@ -44,7 +53,7 @@ async function providersHandler(
 }
 
 app.http('providers', {
-     methods: ['PATCH', 'POST'],
+     methods: ['PATCH', 'POST', 'GET'],
      authLevel: 'anonymous',
      handler: providersHandler,
 })
