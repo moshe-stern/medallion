@@ -1,5 +1,5 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
-import { createEnrollments } from '../api/payer-enrollments'
+import { createEnrollments } from '../services/payer-enrollments'
 import { flatMap, groupBy, map, mapValues } from 'lodash'
 import { Enrollment } from '../types'
 
