@@ -38,8 +38,6 @@ async function providersHandler(
                }
                return { body: JSON.stringify(res.data.results) }
           }
-
-
      } catch (error) {
           return {
                body: JSON.stringify({
