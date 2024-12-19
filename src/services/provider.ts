@@ -66,7 +66,7 @@ async function patchProviders(
      const providers = await getProviders({
           search: providerData.map((p) => p.employeeEmail).join(','),
      })
-     if(!providers) return
+     if (!providers) return
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean }
@@ -129,8 +129,10 @@ async function getCoveredProviders(
 }
 
 async function getProviders(searchParams?: Record<string, string>) {
-   const res = await medallionPagination<ApiV1OrgProvidersListProvidersResponse200['results']>('https://app.medallion.co/api/v1/org/providers', searchParams)
-   return res as ApiV1OrgProvidersListProvidersResponse200['results']
+     const res = await medallionPagination<
+          ApiV1OrgProvidersListProvidersResponse200['results']
+     >('https://app.medallion.co/api/v1/org/providers', searchParams)
+     return res as ApiV1OrgProvidersListProvidersResponse200['results']
 }
 
 export { createProvider, getCoveredProviders, patchProviders, getProviders }
