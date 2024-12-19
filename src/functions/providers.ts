@@ -39,7 +39,11 @@ async function providersHandler(
                     throw new Error('Failed to get Providers')
                }
                if (emailStr) {
-                    return { body: JSON.stringify(data?.map(d => d.email).join(',')) }
+                    return {
+                         body: JSON.stringify(
+                              data?.map((d) => d.email).join(',')
+                         ),
+                    }
                }
                return { body: JSON.stringify(data) }
           }
