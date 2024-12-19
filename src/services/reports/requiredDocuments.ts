@@ -39,7 +39,7 @@ async function getLicenseArr(
                licenseNumber: string | undefined
           }[]
      >
-) {
+) {     
      if (!licenses.has(providerId)) return
      return licenses.get(providerId)!.map((l) => ({
           missingDocument: l.missingDocument,

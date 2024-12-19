@@ -61,6 +61,6 @@ async function providersHandler(
 
 app.http('providers', {
      methods: ['PATCH', 'POST', 'GET'],
-     authLevel: 'anonymous',
+     authLevel: 'admin',
      handler: providersHandler,
 })

@@ -37,6 +37,5 @@ async function providerDocumentHandler(
 
 app.http('provider-documents', {
      methods: ['POST'],
-     authLevel: 'anonymous',
      handler: providerDocumentHandler,
 })

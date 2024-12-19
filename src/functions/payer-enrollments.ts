@@ -47,6 +47,5 @@ async function handlePayerEnrollments(
 
 app.http('payer-enrollments', {
      methods: ['POST'],
-     authLevel: 'anonymous',
      handler: handlePayerEnrollments,
 })
