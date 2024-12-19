@@ -13,19 +13,20 @@ async function handleRequiredDocumentsReport() {
           { missingDocument: boolean; licenseNumber: string | undefined }[]
      >()
      licenses.forEach((license) => {
-          if (!licensesByProviderId.has(license.provider.toString())) {
-               licensesByProviderId.set(license.provider.toString(), [])
+          if (!licensesByProviderId.has(license.provider)) {
+               licensesByProviderId.set(license.provider, [])
           }
-          licensesByProviderId.get(license.provider.toString())!.push({
+          licensesByProviderId.get(license.provider)!.push({
                missingDocument: !license.document,
                licenseNumber: license.license_number,
           })
      })
 
-     const providerMap = providers.map((p) =>
+     const providerMapPromises = providers.map((p) =>
           getLicenseArr(p.full_name, p.id, licensesByProviderId)
      )
-     return providerMap.filter(Boolean)
+     const resolved = await Promise.all(providerMapPromises)
+     return resolved.filter(Boolean).flat()
 }
 
 async function getLicenseArr(
@@ -39,8 +40,8 @@ async function getLicenseArr(
           }[]
      >
 ) {
-     console.log([...licenses.keys()].includes(providerId))
-     return licenses.get(providerId.toString())?.map((l) => ({
+     if(!licenses.has(providerId)) return
+     return licenses.get(providerId)!.map((l) => ({
           missingDocument: l.missingDocument,
           licenseNumber: l.licenseNumber,
           providerId,
