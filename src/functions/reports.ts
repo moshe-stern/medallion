@@ -43,5 +43,6 @@ async function handleReports(request: HttpRequest): Promise<HttpResponseInit> {
 
 app.http('reports', {
      methods: ['GET'],
+     authLevel: 'function',
      handler: handleReports,
 })

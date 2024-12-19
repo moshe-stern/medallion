@@ -47,5 +47,6 @@ async function handlePayerEnrollments(
 
 app.http('payer-enrollments', {
      methods: ['POST'],
+     authLevel: 'function',
      handler: handlePayerEnrollments,
 })
