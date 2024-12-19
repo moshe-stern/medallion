@@ -1,12 +1,10 @@
+import { getLicenses } from '../licences'
 import { getProviders } from '../provider'
-import medallionApi from '@api/medallion-api'
 
 async function handleRequiredDocumentsReport() {
-     const res = await getProviders()
-     const providers = res.data.results
+     const providers = await getProviders()
      if (!providers) return
-     const res2 = await medallionApi.api_v1_org_licenses_list_licenses()
-     const licenses = res2.data.results
+     const licenses = await getLicenses()
      if (!licenses) return
      const licensesByProviderId = new Map<
           string,

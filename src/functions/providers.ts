@@ -33,19 +33,18 @@ async function providersHandler(
                return { body: JSON.stringify(res) }
           } else {
                const emailStr = request.query.get('email-string')
-               const res = await getProviders()
-               const data = res.data.results
-               if (!res.res.ok) {
+               const providers = await getProviders()
+               if (!providers) {
                     throw new Error('Failed to get Providers')
                }
                if (emailStr) {
                     return {
                          body: JSON.stringify(
-                              data?.map((d) => d.email).join(',')
+                              providers?.map((d) => d.email).join(',')
                          ),
                     }
                }
-               return { body: JSON.stringify(data) }
+               return { body: JSON.stringify(providers) }
           }
      } catch (error) {
           return {

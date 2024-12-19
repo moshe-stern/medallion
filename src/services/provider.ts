@@ -1,13 +1,13 @@
 import medallionApi from '@api/medallion-api'
 import { Enrollment } from '../types'
 import {
-     ApiV1OrgProvidersListProvidersMetadataParam,
      ApiV1OrgProvidersListProvidersResponse200,
      ApiV1OrgProvidersPartialUpdateProvidersMetadataParam,
 } from '@api/medallion-api/types'
 import { groupBy, filter, every, includes } from 'lodash'
 import { FetchResponse } from 'api/dist/core'
 import { IProvider, getProvidersByEmail } from 'attain-aba-shared'
+import { medallionPagination } from '..'
 
 async function createProvider(provider: IProvider) {
      if (!provider.email || !provider.email) return
@@ -66,12 +66,13 @@ async function patchProviders(
      const providers = await getProviders({
           search: providerData.map((p) => p.employeeEmail).join(','),
      })
+     if(!providers) return
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean }
      >()
-     providers.data.results?.forEach((p) => {
-          providerMap.set(p.email, { providerId: p.id, updated: false })
+     providers.forEach((p) => {
+          providerMap.set(p?.email, { providerId: p.id, updated: false })
      })
      const promises = providerData.map((p) =>
           patchProvider(
@@ -127,10 +128,9 @@ async function getCoveredProviders(
      return validProviders.length ? validProviders : providers
 }
 
-async function getProviders(
-     metadata?: ApiV1OrgProvidersListProvidersMetadataParam
-) {
-     return medallionApi.api_v1_org_providers_list_providers(metadata)
+async function getProviders(searchParams?: Record<string, string>) {
+   const res = await medallionPagination<ApiV1OrgProvidersListProvidersResponse200['results']>('https://app.medallion.co/api/v1/org/providers', searchParams)
+   return res as ApiV1OrgProvidersListProvidersResponse200['results']
 }
 
 export { createProvider, getCoveredProviders, patchProviders, getProviders }
