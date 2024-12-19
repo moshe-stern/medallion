@@ -32,11 +32,16 @@ async function providersHandler(
                const res = await patchProviders(providerData)
                return { body: JSON.stringify(res) }
           } else {
+               const emailStr = request.query.get('email-string')
                const res = await getProviders()
+               const data = res.data.results
                if (!res.res.ok) {
                     throw new Error('Failed to get Providers')
                }
-               return { body: JSON.stringify(res.data.results) }
+               if (emailStr) {
+                    return { body: JSON.stringify(data?.map(d => d.email).join(',')) }
+               }
+               return { body: JSON.stringify(data) }
           }
      } catch (error) {
           return {
