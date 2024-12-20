@@ -33,18 +33,26 @@ async function providersHandler(
                const emailStr = request.query.get('email-string')
                const offset = +(request.query.get('offsett') || 0)
                const res = await getProviders({ offset })
-               const { results: providers } = res
+               const { results: providers, count } = res
                if (!providers) {
                     throw new Error('Failed to get Providers')
                }
                if (emailStr) {
                     return {
                          body: JSON.stringify(
-                              providers?.map((d) => d.email).join(',')
+                              {
+                                   emails: providers?.map((d) => d.email).join(','),
+                                   remaining: (count || 0) - providers.length
+                              }
                          ),
                     }
                }
-               return { body: JSON.stringify(providers) }
+               return {
+                    body: JSON.stringify({
+                         providers,
+                         remaining: (count || 0) - providers.length
+                    })
+               }
           }
      } catch (error) {
           return {
