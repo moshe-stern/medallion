@@ -3,7 +3,7 @@ import { apiKey } from '..'
 export * from './reports'
 export * from './payer-enrollments'
 export * from './practice'
-export * from './provider'
+export * from './providers/provider'
 export async function medallionPagination<T>(
      url: string,
      searchParams?: Record<string, string>

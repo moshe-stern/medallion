@@ -10,7 +10,7 @@ import {
      createNonExistentPracticesInProvider,
 } from '../practice'
 import { Enrollment } from '../../types'
-import { getCoveredProviders } from '../provider'
+import { getCoveredProviders } from '../providers/provider'
 import { filterEnrollments } from './filter-enrollments'
 import { enrollmentAndPracticePromise } from './enrollment-practice-promise'
 
