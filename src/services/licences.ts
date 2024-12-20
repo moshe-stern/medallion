@@ -3,7 +3,7 @@ import {
      ApiV1OrgLicensesCreateLicensesBodyParam,
      ApiV1OrgLicensesListLicensesResponse200,
 } from '@api/medallion-api/types'
-import { medallionPagination } from '..'
+import { medallionPagination } from '.'
 
 async function createLicense(body: ApiV1OrgLicensesCreateLicensesBodyParam) {
      return medallionApi.api_v1_org_licenses_create_licenses(body)

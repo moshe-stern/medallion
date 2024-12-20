@@ -1,13 +1,14 @@
 import medallionApi from '@api/medallion-api'
-import { Enrollment } from '../types'
+import { Enrollment, IProviderUpdateData } from '../types'
 import {
+     ApiV1OrgProvidersListProvidersMetadataParam,
      ApiV1OrgProvidersListProvidersResponse200,
      ApiV1OrgProvidersPartialUpdateProvidersMetadataParam,
 } from '@api/medallion-api/types'
 import { groupBy, filter, every, includes } from 'lodash'
 import { FetchResponse } from 'api/dist/core'
 import { IProvider, getProvidersByEmail } from 'attain-aba-shared'
-import { medallionPagination } from '..'
+import { medallionPagination } from '.'
 
 async function createProvider(provider: IProvider) {
      if (!provider.email || !provider.email) return
@@ -55,16 +56,12 @@ async function patchProvider(
 }
 
 async function patchProviders(
-     providerData: {
-          employeeNumber: string
-          employeeCode: string
-          workStatus: string
-          employeeTitle: string
-          employeeEmail: string
-     }[]
+     updateData: { data: IProviderUpdateData[], offset?: number}
 ) {
+     const providerData = updateData.data
      const providers = await getProviders({
           search: providerData.map((p) => p.employeeEmail).join(','),
+          offset: updateData.offset
      })
      if (!providers) return
      const providerMap = new Map<
@@ -128,11 +125,9 @@ async function getCoveredProviders(
      return validProviders.length ? validProviders : providers
 }
 
-async function getProviders(searchParams?: Record<string, string>) {
-     const res = await medallionPagination<
-          ApiV1OrgProvidersListProvidersResponse200['results']
-     >('https://app.medallion.co/api/v1/org/providers', searchParams)
-     return res as ApiV1OrgProvidersListProvidersResponse200['results']
+async function getProviders(metadata?: ApiV1OrgProvidersListProvidersMetadataParam) {
+    const res = await medallionApi.api_v1_org_providers_list_providers(metadata)
+    return res.data.results
 }
 
 export { createProvider, getCoveredProviders, patchProviders, getProviders }

@@ -10,4 +10,12 @@ enum EReportType {
      PAYER_LIST = 'PAYER_LIST',
 }
 
-export { Enrollment, EReportType }
+interface IProviderUpdateData {
+     employeeNumber: string
+     employeeCode: string
+     workStatus: string
+     employeeTitle: string
+     employeeEmail: string
+}
+
+export { Enrollment, EReportType, IProviderUpdateData }

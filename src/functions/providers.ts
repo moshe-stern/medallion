@@ -1,6 +1,7 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
 import { createProvider, getProviders, patchProviders } from '../services'
 import { IProvider } from 'attain-aba-shared'
+import { IProviderUpdateData } from '../types'
 
 async function providersHandler(
      request: HttpRequest
@@ -20,16 +21,10 @@ async function providersHandler(
                     throw new Error('Failed to create Provider')
                }
           } else if (request.method === 'PATCH') {
-               const providerData = (await request.json()) as {
-                    employeeNumber: string
-                    employeeCode: string
-                    workStatus: string
-                    employeeTitle: string
-                    employeeEmail: string
-               }[]
-               if (!providerData || !providerData.length)
+               const updateData = (await request.json()) as { data: IProviderUpdateData[], offset?: number}
+               if (!updateData || !updateData.data.length)
                     throw new Error('No provider data provided')
-               const res = await patchProviders(providerData)
+               const res = await patchProviders(updateData)
                return { body: JSON.stringify(res) }
           } else {
                const emailStr = request.query.get('email-string')
