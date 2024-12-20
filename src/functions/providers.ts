@@ -31,7 +31,8 @@ async function providersHandler(
                return { body: JSON.stringify(res) }
           } else {
                const emailStr = request.query.get('email-string')
-               const res = await getProviders()
+               const offset = +(request.query.get('offsett') || 0)
+               const res = await getProviders({ offset })
                const { results: providers } = res
                if (!providers) {
                     throw new Error('Failed to get Providers')
