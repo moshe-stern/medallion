@@ -1,5 +1,5 @@
 import { getLicenses } from '../licences'
-import { getProviders } from '../providers/provider'
+import { getProviders } from '../providers'
 
 async function handleRequiredDocumentsReport() {
      const res = await getProviders()
