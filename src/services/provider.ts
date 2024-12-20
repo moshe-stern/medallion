@@ -61,9 +61,9 @@ async function patchProviders(updateData: {
      const providerData = updateData.data
      const res = await getProviders({
           search: providerData.map((p) => p.employeeEmail).join(','),
-          offset: updateData.offset,
+          offset: (updateData.offset || 0),
      })
-     const providers = res.res
+     const { results: providers, count } = res
      if (!providers) return
      const providerMap = new Map<
           string,
@@ -89,8 +89,8 @@ async function patchProviders(updateData: {
           updated: providerData.map((p) => ({
                ...p,
                updated: providerMap.get(p.employeeEmail)?.updated || false,
-          })), 
-          remaining: (res.total || 0) - providerData.length
+          })),
+          remaining: (count || 0) - providerData.length,
      }
 }
 
@@ -134,10 +134,7 @@ async function getProviders(
 ) {
      const res =
           await medallionApi.api_v1_org_providers_list_providers(metadata)
-     return {
-          res: res.data.results,
-          total: res.data.count,
-     }
+     return res.data
 }
 
 export { createProvider, getCoveredProviders, patchProviders, getProviders }

@@ -2,9 +2,11 @@ import { getLicenses } from '../licences'
 import { getProviders } from '../provider'
 
 async function handleRequiredDocumentsReport() {
-     const providers = await getProviders()
+     const res = await getProviders()
+     const { results: providers } = res
      if (!providers) return
-     const licenses = await getLicenses()
+     const res2 = await getLicenses()
+     const { results: licenses } = res2
      if (!licenses) return
      const licensesByProviderId = new Map<
           string,
