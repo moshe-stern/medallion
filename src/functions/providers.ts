@@ -39,19 +39,17 @@ async function providersHandler(
                }
                if (emailStr) {
                     return {
-                         body: JSON.stringify(
-                              {
-                                   emails: providers?.map((d) => d.email).join(','),
-                                   remaining: (count || 0) - providers.length
-                              }
-                         ),
+                         body: JSON.stringify({
+                              emails: providers?.map((d) => d.email).join(','),
+                              remaining: (count || 0) - providers.length,
+                         }),
                     }
                }
                return {
                     body: JSON.stringify({
                          providers,
-                         remaining: (count || 0) - providers.length
-                    })
+                         remaining: (count || 0) - providers.length,
+                    }),
                }
           }
      } catch (error) {
