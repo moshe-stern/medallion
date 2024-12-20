@@ -8,7 +8,6 @@ import {
 import { groupBy, filter, every, includes } from 'lodash'
 import { FetchResponse } from 'api/dist/core'
 import { IProvider, getProvidersByEmail } from 'attain-aba-shared'
-import { medallionPagination } from '.'
 
 async function createProvider(provider: IProvider) {
      if (!provider.email || !provider.email) return
@@ -55,14 +54,16 @@ async function patchProvider(
      return ok
 }
 
-async function patchProviders(
-     updateData: { data: IProviderUpdateData[], offset?: number}
-) {
+async function patchProviders(updateData: {
+     data: IProviderUpdateData[]
+     offset?: number
+}) {
      const providerData = updateData.data
-     const providers = await getProviders({
+     const res = await getProviders({
           search: providerData.map((p) => p.employeeEmail).join(','),
-          offset: updateData.offset
+          offset: updateData.offset,
      })
+     const providers = res.res
      if (!providers) return
      const providerMap = new Map<
           string,
@@ -84,10 +85,13 @@ async function patchProviders(
           )
      )
      await Promise.all(promises)
-     return providerData.map((p) => ({
-          ...p,
-          updated: providerMap.get(p.employeeEmail)?.updated || false,
-     }))
+     return {
+          updated: providerData.map((p) => ({
+               ...p,
+               updated: providerMap.get(p.employeeEmail)?.updated || false,
+          })), 
+          remaining: (res.total || 0) - providerData.length
+     }
 }
 
 async function getCoveredProviders(
@@ -125,9 +129,15 @@ async function getCoveredProviders(
      return validProviders.length ? validProviders : providers
 }
 
-async function getProviders(metadata?: ApiV1OrgProvidersListProvidersMetadataParam) {
-    const res = await medallionApi.api_v1_org_providers_list_providers(metadata)
-    return res.data.results
+async function getProviders(
+     metadata?: ApiV1OrgProvidersListProvidersMetadataParam
+) {
+     const res =
+          await medallionApi.api_v1_org_providers_list_providers(metadata)
+     return {
+          res: res.data.results,
+          total: res.data.count,
+     }
 }
 
 export { createProvider, getCoveredProviders, patchProviders, getProviders }

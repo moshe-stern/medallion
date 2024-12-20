@@ -21,7 +21,10 @@ async function providersHandler(
                     throw new Error('Failed to create Provider')
                }
           } else if (request.method === 'PATCH') {
-               const updateData = (await request.json()) as { data: IProviderUpdateData[], offset?: number}
+               const updateData = (await request.json()) as {
+                    data: IProviderUpdateData[]
+                    offset?: number
+               }
                if (!updateData || !updateData.data.length)
                     throw new Error('No provider data provided')
                const res = await patchProviders(updateData)
