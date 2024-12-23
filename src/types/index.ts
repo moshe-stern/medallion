@@ -14,8 +14,18 @@ interface IProviderUpdateData {
      employeeNumber: string
      employeeCode: string
      workStatus: string
-     employeeTitle: string
      employeeEmail: string
+     position: string
+     gender: string
+     cellphone: string
+     employeeStatus: string
+     metaDataS1: string
+     metaDataS2: string
+     line1: string
+     line2: string
+     city: string
+     addressState: string
+     zipCode: string
 }
 
 export { Enrollment, EReportType, IProviderUpdateData }

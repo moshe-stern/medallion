@@ -1,13 +1,11 @@
 import medallionApi from '@api/medallion-api'
 import { IProviderUpdateData } from '../../types'
-import { ApiV1OrgProvidersPartialUpdateProvidersMetadataParam } from '@api/medallion-api/types'
+import { ApiV1OrgProvidersPartialUpdateProvidersBodyParam } from '@api/medallion-api/types'
 import { getProviders } from '.'
 
 async function patchProvider(
-     provider: Omit<
-          ApiV1OrgProvidersPartialUpdateProvidersMetadataParam,
-          'provider_pk'
-     >,
+     provider: 
+          ApiV1OrgProvidersPartialUpdateProvidersBodyParam,
      providerMap: Map<
           string,
           {
@@ -19,13 +17,9 @@ async function patchProvider(
 ) {
      const map = providerMap.get(providerEmail)
      if (!map) return false
-     const employementType =
-          (provider.employment_type === 'Full-Time' ||
-               provider.employment_type === 'Part-Time') &&
-          provider.employment_type.toLowerCase().replace('-', '_')
      const res =
           await medallionApi.api_v1_org_providers_partial_update_providers(
-               { ...provider, employment_type: employementType || null },
+               validatePayload(provider),
                { provider_pk: map.providerId }
           )
      const ok = res.res.ok
@@ -42,7 +36,7 @@ async function patchProviders(updateData: {
           search: providerData.map((p) => p.employeeEmail).join(','),
           offset: updateData.offset || 0,
      })
-     const { results: providers, count } = res
+     const { results: providers, count } = res  
      if (!providers) return
      const providerMap = new Map<
           string,
@@ -54,10 +48,22 @@ async function patchProviders(updateData: {
      const promises = providerData.map((p) =>
           patchProvider(
                {
-                    employment_title: p.employeeTitle,
+                    employment_title: p.position,
                     employee_id: p.employeeCode,
                     employee_number: p.employeeNumber,
                     employment_type: p.workStatus,
+                    medallion_email: p.employeeEmail,
+                    gender: p.gender,
+                    line_1: p.line1,
+                    line_2: p.line2,
+                    city: p.city,
+                    address_state: p.addressState,
+                    postal_code: p.zipCode,
+                    country: "US",
+                    primary_phone: p.cellphone,
+                    employment_status: p.employeeStatus,
+                    metadata_s1: p.metaDataS1,
+                    metadata_s2: p.metaDataS2
                },
                providerMap,
                p.employeeEmail
@@ -71,6 +77,16 @@ async function patchProviders(updateData: {
           })),
           total: count,
      }
+}
+
+function validatePayload( provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam): ApiV1OrgProvidersPartialUpdateProvidersBodyParam {
+     const { employment_type, gender } = provider
+     const employementType =
+          (employment_type === 'Full-Time' ||
+               employment_type === 'Part-Time') &&
+          employment_type.toLowerCase().replace('-', '_');
+     const parsedGender = (gender.toLowerCase() === 'female' || gender.toLowerCase() === 'male') && provider.gender.toLowerCase()
+     return { ...provider, employment_type: employementType || null, gender: parsedGender || null }
 }
 
 export { patchProvider, patchProviders }
