@@ -60,7 +60,6 @@ async function patchProviders(updateData: {
                     postal_code: p.zipCode,
                     country: 'US',
                     primary_phone: p.cellphone,
-                    employment_status: p.employeeStatus,
                     metadata_s1: p.metaDataS1,
                     metadata_s2: p.metaDataS2,
                },
@@ -81,7 +80,7 @@ async function patchProviders(updateData: {
 function validatePayload(
      provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam
 ): ApiV1OrgProvidersPartialUpdateProvidersBodyParam {
-     const { employment_type, gender, employment_status } = provider
+     const { employment_type, gender } = provider
      const employementType =
           (employment_type === 'Full-Time' ||
                employment_type === 'Part-Time') &&
@@ -89,20 +88,10 @@ function validatePayload(
      const parsedGender =
           (gender === 'Female' || gender === 'Male') &&
           provider.gender.toLowerCase()
-     let employmentStatus = ''
-     switch (employment_status) {
-          case 'Terminated':
-               employmentStatus = 'inactive'
-               break
-          case 'Active':
-               employmentStatus = 'active'
-               break
-     }
      return {
           ...provider,
           employment_type: employementType || null,
           gender: parsedGender || null,
-          employment_status: employmentStatus,
      }
 }
 
