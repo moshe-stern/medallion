@@ -26,14 +26,9 @@ async function patchProvider(
      return ok
 }
 
-async function patchProviders(updateData: {
-     data: IProviderUpdateData[]
-     offset?: number
-}) {
-     const providerData = updateData.data
+async function patchProviders(providerData: IProviderUpdateData[]) {
      const res = await getProviders({
           search: providerData.map((p) => p.employeeEmail).join(','),
-          offset: updateData.offset || 0,
      })
      const { results: providers, count } = res
      if (!providers) return
