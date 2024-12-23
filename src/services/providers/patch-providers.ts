@@ -87,8 +87,7 @@ function validatePayload(
                employment_type === 'Part-Time') &&
           employment_type.toLowerCase().replace('-', '_')
      const parsedGender =
-          (gender === 'Female' ||
-               gender === 'Male') &&
+          (gender === 'Female' || gender === 'Male') &&
           provider.gender.toLowerCase()
      let employmentStatus = ''
      switch (employment_status) {
@@ -103,7 +102,7 @@ function validatePayload(
           ...provider,
           employment_type: employementType || null,
           gender: parsedGender || null,
-          employment_status: employmentStatus
+          employment_status: employmentStatus,
      }
 }
 
