@@ -4,8 +4,7 @@ import { ApiV1OrgProvidersPartialUpdateProvidersBodyParam } from '@api/medallion
 import { getProviders } from '.'
 
 async function patchProvider(
-     provider: 
-          ApiV1OrgProvidersPartialUpdateProvidersBodyParam,
+     provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam,
      providerMap: Map<
           string,
           {
@@ -36,7 +35,7 @@ async function patchProviders(updateData: {
           search: providerData.map((p) => p.employeeEmail).join(','),
           offset: updateData.offset || 0,
      })
-     const { results: providers, count } = res  
+     const { results: providers, count } = res
      if (!providers) return
      const providerMap = new Map<
           string,
@@ -59,11 +58,11 @@ async function patchProviders(updateData: {
                     city: p.city,
                     address_state: p.addressState,
                     postal_code: p.zipCode,
-                    country: "US",
+                    country: 'US',
                     primary_phone: p.cellphone,
                     employment_status: p.employeeStatus,
                     metadata_s1: p.metaDataS1,
-                    metadata_s2: p.metaDataS2
+                    metadata_s2: p.metaDataS2,
                },
                providerMap,
                p.employeeEmail
@@ -79,14 +78,23 @@ async function patchProviders(updateData: {
      }
 }
 
-function validatePayload( provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam): ApiV1OrgProvidersPartialUpdateProvidersBodyParam {
+function validatePayload(
+     provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam
+): ApiV1OrgProvidersPartialUpdateProvidersBodyParam {
      const { employment_type, gender } = provider
      const employementType =
           (employment_type === 'Full-Time' ||
                employment_type === 'Part-Time') &&
-          employment_type.toLowerCase().replace('-', '_');
-     const parsedGender = (gender.toLowerCase() === 'female' || gender.toLowerCase() === 'male') && provider.gender.toLowerCase()
-     return { ...provider, employment_type: employementType || null, gender: parsedGender || null }
+          employment_type.toLowerCase().replace('-', '_')
+     const parsedGender =
+          (gender.toLowerCase() === 'female' ||
+               gender.toLowerCase() === 'male') &&
+          provider.gender.toLowerCase()
+     return {
+          ...provider,
+          employment_type: employementType || null,
+          gender: parsedGender || null,
+     }
 }
 
 export { patchProvider, patchProviders }
