@@ -69,7 +69,7 @@ async function patchProviders(updateData: {
                ...p,
                updated: providerMap.get(p.employeeEmail)?.updated || false,
           })),
-          remaining: (count || 0) - providerData.length,
+          total: count,
      }
 }
 

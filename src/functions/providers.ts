@@ -31,7 +31,7 @@ async function providersHandler(
                return { body: JSON.stringify(res) }
           } else {
                const emailStr = request.query.get('email-string')
-               const offset = +(request.query.get('offsett') || 0)
+               const offset = +(request.query.get('offset') || 0)
                const res = await getProviders({ offset })
                const { results: providers, count } = res
                if (!providers) {
@@ -41,14 +41,14 @@ async function providersHandler(
                     return {
                          body: JSON.stringify({
                               emails: providers?.map((d) => d.email).join(','),
-                              remaining: (count || 0) - providers.length,
+                              total: count,
                          }),
                     }
                }
                return {
                     body: JSON.stringify({
                          providers,
-                         remaining: (count || 0) - providers.length,
+                         total: count,
                     }),
                }
           }
