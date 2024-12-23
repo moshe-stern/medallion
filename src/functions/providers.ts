@@ -25,6 +25,8 @@ async function providersHandler(
                     (await request.json()) as IProviderUpdateData[]
                if (!updateData || !updateData.length)
                     throw new Error('No provider data provided')
+               if(updateData.length > 100)
+                    throw new Error('Can only update 100 at a time')
                const res = await patchProviders(updateData)
                return { body: JSON.stringify(res) }
           } else {
