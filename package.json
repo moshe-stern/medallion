@@ -17,7 +17,7 @@
           "@api/medallion-api": "file:.api/apis/medallion-api",
           "@azure/identity": "^4.5.0",
           "@types/lodash": "^4.17.13",
-          "attain-aba-shared": "^1.0.7",
+          "attain-aba-shared": "^1.0.20",
           "dotenv": "^16.4.5",
           "lodash": "^4.17.21",
           "msnodesqlv8": "^4.4.0",
