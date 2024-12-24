@@ -16,19 +16,25 @@ async function patchProvider(
 ) {
      const map = providerMap.get(providerEmail)
      if (!map) return false
-     const res =
-          await medallionApi.api_v1_org_providers_partial_update_providers(
-               validatePayload(provider),
-               { provider_pk: map.providerId }
-          )
-     const ok = res.res.ok
-     map.updated = ok
-     return ok
+     try {
+          const res =
+               await medallionApi.api_v1_org_providers_partial_update_providers(
+                    validatePayload(provider),
+                    { provider_pk: map.providerId }
+               )
+          const ok = res.res.ok
+          map.updated = ok
+          return ok
+     } catch (error) {
+          console.error(error)
+          return false
+     }
+
 }
 
 async function patchProviders(providerData: IProviderUpdateData[]) {
      const res = await getProviders({
-          search: providerData.map((p) => p.employeeEmail).join(','),
+          search: providerData.map((p) => p.employeeEmail.toLowerCase()).join(','),
      })
      const { results: providers, count } = res
      if (!providers) return
@@ -42,7 +48,7 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
      const promises = providerData.map((p) =>
           patchProvider(
                {
-                    employment_title: p.position,
+                    employment_title: p.position || '',
                     employee_id: p.employeeCode,
                     employee_number: p.employeeNumber,
                     employment_type: p.workStatus,
