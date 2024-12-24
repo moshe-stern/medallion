@@ -40,7 +40,9 @@ async function providersHandler(
                if (emailStr) {
                     return {
                          body: JSON.stringify({
-                              emails: providers?.map((d) => d.email.toLowerCase()).join(','),
+                              emails: providers
+                                   ?.map((d) => d.email.toLowerCase())
+                                   .join(','),
                               total: count,
                          }),
                     }

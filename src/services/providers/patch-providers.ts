@@ -29,12 +29,13 @@ async function patchProvider(
           console.error(error)
           return false
      }
-
 }
 
 async function patchProviders(providerData: IProviderUpdateData[]) {
      const res = await getProviders({
-          search: providerData.map((p) => p.employeeEmail.toLowerCase()).join(','),
+          search: providerData
+               .map((p) => p.employeeEmail.toLowerCase())
+               .join(','),
      })
      const { results: providers, count } = res
      if (!providers) return
