@@ -3,6 +3,7 @@ interface Enrollment {
      practiceNames: string[]
      hasNonCompliantBcba?: boolean
      coveredRegions?: string[]
+     entity?: string
 }
 
 enum EReportType {

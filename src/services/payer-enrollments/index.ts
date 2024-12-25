@@ -13,6 +13,7 @@ import { Enrollment } from '../../types'
 import { getCoveredProviders } from '../providers'
 import { filterEnrollments } from './filter-enrollments'
 import { enrollmentAndPracticePromise } from './enrollment-practice-promise'
+import { getGroupProfileIdByName } from '../group-profiles'
 
 export async function createEnrollments(
      enrollments: Enrollment[],
@@ -31,9 +32,12 @@ export async function createEnrollments(
      if (!providers.data.results?.length)
           throw new Error('Providers not found in State')
 
-     const nonExistentEnrollments = await filterEnrollments(
+     let nonExistentEnrollments = await filterEnrollments(
           providers,
           enrollments
+     )
+     nonExistentEnrollments = await Promise.all(
+          nonExistentEnrollments.map(async e => ({...e, entity: await getGroupProfileIdByName(e.entity)}))
      )
      const enrollmentPromises = nonExistentEnrollments.map((enrollment) =>
           createEnrollment(enrollment, state, providers.data.results)

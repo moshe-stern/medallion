@@ -7,7 +7,7 @@ export async function enrollmentAndPracticePromise(
      enrollment: Enrollment,
      state: string
 ) {
-     const { practiceNames, payerName } = enrollment
+     const { practiceNames, payerName, entity } = enrollment
      const providerPractices =
           await medallionApi.api_v1_org_provider_practice_associations_list_practices(
                {
@@ -23,6 +23,7 @@ export async function enrollmentAndPracticePromise(
           medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(
                {
                     payer_name: payerName,
+                    group_profile: entity,
                     practices: filteredPractices,
                     provider: providerId,
                     is_medallion_owned: true,

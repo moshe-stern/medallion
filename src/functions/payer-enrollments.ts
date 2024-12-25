@@ -8,24 +8,26 @@ async function handlePayerEnrollments(
 ): Promise<HttpResponseInit> {
      try {
           const data = (await request.json()) as {
-               enrollments: { Payor: string; ServiceAddress: string }[]
+               enrollments: { Payor: string; ServiceAddress: string, Entity: string }[]
                state: string
           }
           const mappedEnrollments: Enrollment[] = data.enrollments.map(
                (enroll) => ({
                     payerName: enroll.Payor,
                     practiceNames: [enroll.ServiceAddress],
+                    entity: enroll.Entity
                })
           )
           const grouped = mapValues(
                groupBy(mappedEnrollments, 'payerName'),
-               (payorGroup) => payorGroup.map((item) => item.practiceNames)
+               (payorGroup) => payorGroup.map((item) => ({practices: item.practiceNames, entity: item.entity}))
           )
           const mappedGroup: Enrollment[] = map(
                grouped,
-               (practiceNames, payerName) => ({
+               (group, payerName) => ({
                     payerName,
-                    practiceNames: flatMap(practiceNames),
+                    practiceNames: flatMap(group, (item) => item.practices),
+                    entity: group[0].entity
                })
           )
           const enrollments = await createEnrollments(mappedGroup, data.state)
