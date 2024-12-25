@@ -1,6 +1,6 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
 import { createEnrollments } from '../services/payer-enrollments'
-import { flatMap, groupBy, map, mapValues } from 'lodash'
+import { groupBy, map, mapValues } from 'lodash'
 import { Enrollment } from '../types'
 
 async function handlePayerEnrollments(
@@ -34,7 +34,7 @@ async function handlePayerEnrollments(
                grouped,
                (group, payerName) => ({
                     payerName,
-                    practiceNames: flatMap(group, (item) => item.practices),
+                    practiceNames: group.flatMap(g => g.practices),
                     entity: group[0].entity,
                })
           )

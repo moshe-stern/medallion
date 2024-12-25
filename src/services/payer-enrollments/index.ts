@@ -73,7 +73,7 @@ async function createEnrollment(
      )
      await Promise.all(createPracticesPromisesInProviders)
      const resolved = await Promise.all(enrollmentPromises)
-     return resolved.every((res) => res.res.ok)
+     return resolved.every((res) => res?.res.ok)
 }
 
 export * from './enrollment-practice-promise'

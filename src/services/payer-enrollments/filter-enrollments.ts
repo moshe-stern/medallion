@@ -32,7 +32,7 @@ export async function filterEnrollments(
      return filter(
           enrollments,
           (enrollment) =>
-               !some(
+               some(
                     resolvedEnrollments,
                     (resolvedEnrollment) =>
                          resolvedEnrollment.payerName ===

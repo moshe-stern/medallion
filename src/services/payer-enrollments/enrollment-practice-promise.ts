@@ -8,28 +8,33 @@ export async function enrollmentAndPracticePromise(
      state: string
 ) {
      const { practiceNames, payerName, entity } = enrollment
-     const providerPractices =
-          await medallionApi.api_v1_org_provider_practice_associations_list_practices(
-               {
-                    state,
-                    provider: providerId,
-               }
+     try {
+          const providerPractices =
+               await medallionApi.api_v1_org_provider_practice_associations_list_practices(
+                    {
+                         state,
+                         provider: providerId,
+                    }
+               )
+          const filteredPractices = filter(
+               providerPractices.data.results?.map((pract) => pract.practice),
+               (pract) => includes(practiceNames, pract.name)
           )
-     const filteredPractices = filter(
-          providerPractices.data.results?.map((pract) => pract.practice),
-          (pract) => includes(practiceNames, pract.name)
-     )
-     const res2 =
-          medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(
-               {
-                    payer_name: payerName,
-                    group_profile: entity,
-                    practices: filteredPractices,
-                    provider: providerId,
-                    is_medallion_owned: true,
-                    resourcetype: 'NewProviderPayerEnrollmentServiceRequest',
-                    state: state as PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam['state'],
-               }
-          )
-     return res2
+          const res2 =
+               await medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(
+                    {
+                         payer_name: payerName,
+                         par_group: entity,
+                         practices: filteredPractices,
+                         provider: providerId,
+                         is_medallion_owned: true,
+                         resourcetype: 'NewProviderPayerEnrollmentServiceRequest',
+                         state: state as PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam['state'],
+                    }
+               )
+          return res2
+     } catch (error) {
+          console.error(error)
+     }
+
 }
