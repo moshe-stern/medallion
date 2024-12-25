@@ -37,7 +37,10 @@ export async function createEnrollments(
           enrollments
      )
      nonExistentEnrollments = await Promise.all(
-          nonExistentEnrollments.map(async e => ({...e, entity: await getGroupProfileIdByName(e.entity)}))
+          nonExistentEnrollments.map(async (e) => ({
+               ...e,
+               entity: await getGroupProfileIdByName(e.entity),
+          }))
      )
      const enrollmentPromises = nonExistentEnrollments.map((enrollment) =>
           createEnrollment(enrollment, state, providers.data.results)
