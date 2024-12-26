@@ -4,6 +4,7 @@ interface Enrollment {
      hasNonCompliantBcba?: boolean
      coveredRegions?: string[]
      entity?: string
+     linesOfBusiness?: string[]
 }
 
 enum EReportType {

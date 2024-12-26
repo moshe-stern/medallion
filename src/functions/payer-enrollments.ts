@@ -17,9 +17,9 @@ async function handlePayerEnrollments(
           }
           const mappedEnrollments: Enrollment[] = data.enrollments.map(
                (enroll) => ({
-                    payerName: enroll.Payor,
-                    practiceNames: [enroll.ServiceAddress],
-                    entity: enroll.Entity,
+                    payerName: enroll.Payor.trim(),
+                    practiceNames: [enroll.ServiceAddress.trim()],
+                    entity: enroll.Entity.trim(),
                })
           )
           const grouped = mapValues(
@@ -34,15 +34,23 @@ async function handlePayerEnrollments(
                grouped,
                (group, payerName) => ({
                     payerName,
-                    practiceNames: group.flatMap(g => g.practices),
+                    practiceNames: group.flatMap((g) => g.practices),
                     entity: group[0].entity,
                })
           )
-          const enrollments = await createEnrollments(mappedGroup, data.state)
+          const enrollments = await createEnrollments(
+               mappedGroup,
+               data.state
+          )
           if (!enrollments) {
                throw new Error('Failed to create Enrollments')
           }
-          return { status: 201 }
+          return {
+               status: 201,
+               body: JSON.stringify({
+                    message: 'Successfully created Enrollments',
+               }),
+          }
      } catch (error) {
           return {
                body: JSON.stringify({

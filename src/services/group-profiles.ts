@@ -5,6 +5,6 @@ export async function getGroupProfileIdByName(name?: string) {
           name,
      })
      const data = res.data.results
-     if (!data) return
+     if (!data?.length) return
      return data[0].id
 }
