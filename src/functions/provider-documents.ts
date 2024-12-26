@@ -13,8 +13,8 @@ async function providerDocumentHandler(
                body: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam
                metadata: ApiV1OrgProvidersDocumentsCreateProviderDocumentsMetadataParam
           }
-          const res = await uploadProviderDocument(documnetPayload)
-          if (res.status === 201) {
+          const res = await uploadProviderDocument(documnetPayload.body, documnetPayload.metadata.provider_pk)
+          if (res) {
                return {
                     body: JSON.stringify({
                          message: 'Successfully uploaded document',

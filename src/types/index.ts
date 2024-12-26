@@ -1,3 +1,5 @@
+import { ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam, ApiV1OrgProvidersDocumentsCreateProviderDocumentsMetadataParam } from "@api/medallion-api/types"
+
 interface Enrollment {
      payerName: string
      practiceNames: string[]
@@ -27,7 +29,16 @@ interface IProviderUpdateData {
      line2: string
      city: string
      addressState: string
-     zipCode: string
+     zipCode: string,
+     cityOfBirth: string
+     birthState: string
+     race: string,
+     documents?: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam[]
+
+}
+interface IProviderDocumentUpload {
+     body: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam
+     metadata: ApiV1OrgProvidersDocumentsCreateProviderDocumentsMetadataParam
 }
 
-export { Enrollment, EReportType, IProviderUpdateData }
+export { Enrollment, EReportType, IProviderUpdateData, IProviderDocumentUpload}
