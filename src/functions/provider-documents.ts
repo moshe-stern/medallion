@@ -13,7 +13,10 @@ async function providerDocumentHandler(
                body: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam
                metadata: ApiV1OrgProvidersDocumentsCreateProviderDocumentsMetadataParam
           }
-          const res = await uploadProviderDocument(documnetPayload.body, documnetPayload.metadata.provider_pk)
+          const res = await uploadProviderDocument(
+               documnetPayload.body,
+               documnetPayload.metadata.provider_pk
+          )
           if (res) {
                return {
                     body: JSON.stringify({

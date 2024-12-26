@@ -1,6 +1,9 @@
 import medallionApi from '@api/medallion-api'
 import { IProviderUpdateData } from '../../types'
-import { ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam, ApiV1OrgProvidersPartialUpdateProvidersBodyParam } from '@api/medallion-api/types'
+import {
+     ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam,
+     ApiV1OrgProvidersPartialUpdateProvidersBodyParam,
+} from '@api/medallion-api/types'
 import { getProviders } from '.'
 import { uploadProviderDocument } from '../provider-documents'
 
@@ -24,7 +27,9 @@ async function patchProvider(
                     validatePayload(provider),
                     { provider_pk: map.providerId }
                )
-          const res2 = await Promise.all(documents.map(d => uploadProviderDocument(d, map.providerId)))
+          const res2 = await Promise.all(
+               documents.map((d) => uploadProviderDocument(d, map.providerId))
+          )
           map.updated = res.res.ok && res2.every(Boolean)
      } catch (error) {
           console.error(error)
@@ -67,14 +72,13 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
                          metadata_s2: p.metaDataS2,
                          birth_city: p.cityOfBirth,
                          birth_state: p.birthState,
-                         race: p.race
+                         race: p.race,
                     },
                     providerMap,
                     p.employeeEmail,
                     p.documents || []
                )
-          ),
-
+          )
      )
      return {
           updated: providerData.map((p) => ({
