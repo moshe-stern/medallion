@@ -21,7 +21,9 @@ export async function enrollmentAndPracticePromise(
                providerPractices.data.results?.map((pract) => pract.practice),
                (pract) => includes(practiceNames, pract.name)
           )
-          const businesses = (await getLinesOfBusiness()).filter(b => linesOfBusiness?.includes(b.label))
+          const businesses = (await getLinesOfBusiness()).filter((b) =>
+               linesOfBusiness?.includes(b.label)
+          )
           const res2 =
                await medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(
                     {
@@ -33,7 +35,7 @@ export async function enrollmentAndPracticePromise(
                          is_medallion_owned: true,
                          resourcetype:
                               'NewProviderPayerEnrollmentServiceRequest',
-                         state: state as PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam['state']
+                         state: state as PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam['state'],
                     }
                )
           return res2

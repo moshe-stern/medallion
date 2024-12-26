@@ -38,10 +38,7 @@ async function handlePayerEnrollments(
                     entity: group[0].entity,
                })
           )
-          const enrollments = await createEnrollments(
-               mappedGroup,
-               data.state
-          )
+          const enrollments = await createEnrollments(mappedGroup, data.state)
           if (!enrollments) {
                throw new Error('Failed to create Enrollments')
           }
