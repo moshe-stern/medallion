@@ -17,7 +17,6 @@ interface IProviderUpdateData {
      employeeNumber: string
      employeeStatus: string
      position: string
-     subRegionDesc: string
      workEmail: string
      personalEmail: string
      dolStatus: string
