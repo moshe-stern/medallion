@@ -31,9 +31,11 @@ async function patchProvider(
           cityOfBirth,
           stateOfBirth,
           eeo1Ethnicity,
-     } = provider;
+     } = provider
 
-     const map = providerMap.has(workEmail) ? providerMap.get(workEmail) : providerMap.get(personalEmail)
+     const map = providerMap.has(workEmail)
+          ? providerMap.get(workEmail)
+          : providerMap.get(personalEmail)
      if (!map) return false
      try {
           const res =
@@ -66,8 +68,8 @@ async function patchProvider(
 }
 
 async function patchProviders(providerData: IProviderUpdateData[]) {
-     const personalEmails = providerData.map(p => p.personalEmail)
-     const workEmail = providerData.map(p => p.workEmail)
+     const personalEmails = providerData.map((p) => p.personalEmail)
+     const workEmail = providerData.map((p) => p.workEmail)
      const res = await getProviders({
           search: [...personalEmails, ...workEmail].join(','),
      })
@@ -80,17 +82,13 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
      providers.forEach((p) => {
           providerMap.set(p?.email, { providerId: p.id, updated: false })
      })
-     await Promise.all(
-          providerData.map((p) =>
-               patchProvider(
-                    p, providerMap
-               )
-          )
-     )
+     await Promise.all(providerData.map((p) => patchProvider(p, providerMap)))
      return {
           updated: providerData.map((p) => ({
                ...p,
-               updated: providerMap.has(p.workEmail) ? providerMap.get(p.workEmail)?.updated : providerMap.get(p.personalEmail)?.updated,
+               updated: providerMap.has(p.workEmail)
+                    ? providerMap.get(p.workEmail)?.updated
+                    : providerMap.get(p.personalEmail)?.updated,
           })),
           total: count,
      }

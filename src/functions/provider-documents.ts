@@ -1,4 +1,3 @@
-
 import { HttpRequest, HttpResponseInit, app } from '@azure/functions'
 import { uploadProviderDocuments } from '../services/provider-documents'
 import { IProviderDocumentUploadDTO } from '../types'
@@ -8,22 +7,27 @@ async function providerDocumentHandler(
      request: HttpRequest
 ): Promise<HttpResponseInit> {
      try {
-          const payload = await request.json() as IProviderDocumentUploadDTO[]
-          const personalEmails = payload.map(p => p.email)
-          const workEmail = payload.map(p => p.workEmail)
+          const payload = (await request.json()) as IProviderDocumentUploadDTO[]
+          const personalEmails = payload.map((p) => p.email)
+          const workEmail = payload.map((p) => p.workEmail)
           const res = await getProviders({
                search: [...personalEmails, ...workEmail].join(','),
           })
           const providers = res.results
           if (!providers) throw new Error('No Providers found')
-          const providerMap = new Map<string, { providerId: string, updated: boolean }>()
-          providers.forEach(p => {
+          const providerMap = new Map<
+               string,
+               { providerId: string; updated: boolean }
+          >()
+          providers.forEach((p) => {
                providerMap.set(p.email, {
                     providerId: p.id,
-                    updated: false
+                    updated: false,
                })
-          });
-          await Promise.all(payload.map(p => uploadProviderDocuments(p, providerMap)))
+          })
+          await Promise.all(
+               payload.map((p) => uploadProviderDocuments(p, providerMap))
+          )
           return {
                body: JSON.stringify({
                     updated: payload.map((p) => ({
@@ -31,8 +35,8 @@ async function providerDocumentHandler(
                          updated: providerMap.has(p.workEmail)
                               ? providerMap.get(p.workEmail)?.updated
                               : providerMap.get(p.email)?.updated,
-                    }))
-               })
+                    })),
+               }),
           }
      } catch (error) {
           return {

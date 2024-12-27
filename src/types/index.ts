@@ -1,8 +1,3 @@
-import {
-     ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam,
-     ApiV1OrgProvidersDocumentsCreateProviderDocumentsMetadataParam,
-} from '@api/medallion-api/types'
-
 interface Enrollment {
      payerName: string
      practiceNames: string[]
@@ -18,41 +13,47 @@ enum EReportType {
 }
 
 interface IProviderUpdateData {
-     employeeCode: string;
-     employeeNumber: string;
-     employeeStatus: string;
-     position: string;
-     subRegionDesc: string;
-     workEmail: string;
-     personalEmail: string;
-     dolStatus: string;
-     primaryPhone: string;
-     street: string;
-     streetLine2: string;
-     city: string;
-     state: string;
-     zipcode: string;
-     gender: string;
-     cityOfBirth: string;
-     stateOfBirth: string;
-     eeo1Ethnicity: string;
+     employeeCode: string
+     employeeNumber: string
+     employeeStatus: string
+     position: string
+     subRegionDesc: string
+     workEmail: string
+     personalEmail: string
+     dolStatus: string
+     primaryPhone: string
+     street: string
+     streetLine2: string
+     city: string
+     state: string
+     zipcode: string
+     gender: string
+     cityOfBirth: string
+     stateOfBirth: string
+     eeo1Ethnicity: string
      metaDataS1: string
      metaDataS2: string
 }
 interface IProviderDocumentUploadDTO {
      files: {
-          path: string,
-          kind: string,
+          path: string
+          kind: string
           title: string
      }[]
-     email: string,
+     email: string
      workEmail: string
 }
 
 interface IProviderDocument {
-     fileContent: Blob,
-     providerPk: string,
-     kind: string,
+     fileContent: Blob
+     providerPk: string
+     kind: string
      title: string
 }
-export { Enrollment, EReportType, IProviderUpdateData, IProviderDocumentUploadDTO, IProviderDocument }
+export {
+     Enrollment,
+     EReportType,
+     IProviderUpdateData,
+     IProviderDocumentUploadDTO,
+     IProviderDocument,
+}
