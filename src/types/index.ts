@@ -18,29 +18,41 @@ enum EReportType {
 }
 
 interface IProviderUpdateData {
-     employeeNumber: string
-     employeeCode: string
-     workStatus: string
-     employeeEmail: string
-     position: string
-     gender: string
-     cellphone: string
-     employeeStatus: string
+     employeeCode: string;
+     employeeNumber: string;
+     employeeStatus: string;
+     position: string;
+     subRegionDesc: string;
+     workEmail: string;
+     personalEmail: string;
+     dolStatus: string;
+     primaryPhone: string;
+     street: string;
+     streetLine2: string;
+     city: string;
+     state: string;
+     zipcode: string;
+     gender: string;
+     cityOfBirth: string;
+     stateOfBirth: string;
+     eeo1Ethnicity: string;
      metaDataS1: string
      metaDataS2: string
-     line1: string
-     line2: string
-     city: string
-     addressState: string
-     zipCode: string
-     cityOfBirth: string
-     birthState: string
-     race: string
-     documents?: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam[]
 }
-interface IProviderDocumentUpload {
-     body: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam
-     metadata: ApiV1OrgProvidersDocumentsCreateProviderDocumentsMetadataParam
+interface IProviderDocumentUploadDTO {
+     files: {
+          path: string,
+          kind: string,
+          title: string
+     }[]
+     email: string,
+     workEmail: string
 }
 
-export { Enrollment, EReportType, IProviderUpdateData, IProviderDocumentUpload }
+interface IProviderDocument {
+     fileContent: Blob,
+     providerPk: string,
+     kind: string,
+     title: string
+}
+export { Enrollment, EReportType, IProviderUpdateData, IProviderDocumentUploadDTO, IProviderDocument }

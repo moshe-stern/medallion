@@ -1,46 +1,75 @@
 import medallionApi from '@api/medallion-api'
 import { IProviderUpdateData } from '../../types'
-import {
-     ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam,
-     ApiV1OrgProvidersPartialUpdateProvidersBodyParam,
-} from '@api/medallion-api/types'
 import { getProviders } from '.'
-import { uploadProviderDocument } from '../provider-documents'
 
 async function patchProvider(
-     provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam,
+     provider: IProviderUpdateData,
      providerMap: Map<
           string,
           {
                providerId: string
                updated: boolean
           }
-     >,
-     providerEmail: string,
-     documents: ApiV1OrgProvidersDocumentsCreateProviderDocumentsBodyParam[]
+     >
 ) {
-     const map = providerMap.get(providerEmail)
+     const {
+          position,
+          employeeCode,
+          employeeNumber,
+          dolStatus,
+          gender,
+          street,
+          streetLine2,
+          city,
+          state,
+          zipcode,
+          primaryPhone,
+          metaDataS1,
+          metaDataS2,
+          workEmail,
+          personalEmail,
+          cityOfBirth,
+          stateOfBirth,
+          eeo1Ethnicity,
+     } = provider;
+
+     const map = providerMap.has(workEmail) ? providerMap.get(workEmail) : providerMap.get(personalEmail)
      if (!map) return false
      try {
           const res =
                await medallionApi.api_v1_org_providers_partial_update_providers(
-                    validatePayload(provider),
+                    {
+                         employment_title: position || '',
+                         employee_id: employeeCode,
+                         employee_number: employeeNumber,
+                         employment_type: dolStatus,
+                         gender,
+                         line_1: street,
+                         line_2: streetLine2,
+                         city,
+                         address_state: state,
+                         postal_code: zipcode,
+                         country: 'US',
+                         primary_phone: primaryPhone,
+                         metadata_s1: metaDataS1,
+                         metadata_s2: metaDataS2,
+                         birth_city: cityOfBirth,
+                         birth_state: stateOfBirth,
+                         race: eeo1Ethnicity,
+                    },
                     { provider_pk: map.providerId }
                )
-          const res2 = await Promise.all(
-               documents.map((d) => uploadProviderDocument(d, map.providerId))
-          )
-          map.updated = res.res.ok && res2.every(Boolean)
+          map.updated = res.res.ok
      } catch (error) {
           console.error(error)
      }
 }
 
 async function patchProviders(providerData: IProviderUpdateData[]) {
+     const personalEmails = providerData.map(p => p.personalEmail)
+     const workEmail = providerData.map(p => p.workEmail)
      const res = await getProviders({
-          search: providerData
-               .map((p) => p.employeeEmail.toLowerCase())
-               .join(','),
+          search: [...personalEmails, ...workEmail].join(','),
      })
      const { results: providers, count } = res
      if (!providers) return
@@ -54,56 +83,16 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
      await Promise.all(
           providerData.map((p) =>
                patchProvider(
-                    {
-                         employment_title: p.position || '',
-                         employee_id: p.employeeCode,
-                         employee_number: p.employeeNumber,
-                         employment_type: p.workStatus,
-                         medallion_email: p.employeeEmail,
-                         gender: p.gender,
-                         line_1: p.line1,
-                         line_2: p.line2,
-                         city: p.city,
-                         address_state: p.addressState,
-                         postal_code: p.zipCode,
-                         country: 'US',
-                         primary_phone: p.cellphone,
-                         metadata_s1: p.metaDataS1,
-                         metadata_s2: p.metaDataS2,
-                         birth_city: p.cityOfBirth,
-                         birth_state: p.birthState,
-                         race: p.race,
-                    },
-                    providerMap,
-                    p.employeeEmail,
-                    p.documents || []
+                    p, providerMap
                )
           )
      )
      return {
           updated: providerData.map((p) => ({
                ...p,
-               updated: providerMap.get(p.employeeEmail)?.updated || false,
+               updated: providerMap.has(p.workEmail) ? providerMap.get(p.workEmail)?.updated : providerMap.get(p.personalEmail)?.updated,
           })),
           total: count,
-     }
-}
-
-function validatePayload(
-     provider: ApiV1OrgProvidersPartialUpdateProvidersBodyParam
-): ApiV1OrgProvidersPartialUpdateProvidersBodyParam {
-     const { employment_type, gender } = provider
-     const employementType =
-          (employment_type === 'Full-Time' ||
-               employment_type === 'Part-Time') &&
-          employment_type.toLowerCase().replace('-', '_')
-     const parsedGender =
-          (gender === 'Female' || gender === 'Male') &&
-          provider.gender.toLowerCase()
-     return {
-          ...provider,
-          employment_type: employementType || null,
-          gender: parsedGender || null,
      }
 }
 
