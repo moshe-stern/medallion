@@ -8,13 +8,13 @@ async function providerDocumentHandler(
 ): Promise<HttpResponseInit> {
      try {
           const payload = (await request.json()) as IProviderDocumentUploadDTO[]
-          const personalEmails = payload.map((p) => p.email)
+          const personalEmails = payload.map((p) => p.personalEmail)
           const workEmail = payload.map((p) => p.workEmail)
           const res = await getProviders({
                search: [...personalEmails, ...workEmail].join(','),
           })
           const providers = res.results
-          if (!providers) throw new Error('No Providers found')
+          if (!providers?.length) throw new Error('No Providers found')
           const providerMap = new Map<
                string,
                { providerId: string; updated: boolean }
@@ -32,9 +32,11 @@ async function providerDocumentHandler(
                body: JSON.stringify({
                     updated: payload.map((p) => ({
                          ...p,
-                         updated: providerMap.has(p.workEmail)
-                              ? providerMap.get(p.workEmail)?.updated
-                              : providerMap.get(p.email)?.updated,
+                         updated:
+                              (providerMap.has(p.workEmail)
+                                   ? providerMap.get(p.workEmail)?.updated
+                                   : providerMap.get(p.personalEmail)
+                                          ?.updated) || false,
                     })),
                }),
           }

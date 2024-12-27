@@ -30,9 +30,8 @@ async function patchProvider(
           personalEmail,
           cityOfBirth,
           stateOfBirth,
-          eeo1Ethnicity,
+          // eeo1Ethnicity,
      } = provider
-
      const map = providerMap.has(workEmail)
           ? providerMap.get(workEmail)
           : providerMap.get(personalEmail)
@@ -57,7 +56,6 @@ async function patchProvider(
                          metadata_s2: metaDataS2,
                          birth_city: cityOfBirth,
                          birth_state: stateOfBirth,
-                         race: eeo1Ethnicity,
                     },
                     { provider_pk: map.providerId }
                )
@@ -74,7 +72,7 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
           search: [...personalEmails, ...workEmail].join(','),
      })
      const { results: providers, count } = res
-     if (!providers) return
+     if (!providers?.length) throw new Error('No Providers Found')
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean }
@@ -86,9 +84,10 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
      return {
           updated: providerData.map((p) => ({
                ...p,
-               updated: providerMap.has(p.workEmail)
-                    ? providerMap.get(p.workEmail)?.updated
-                    : providerMap.get(p.personalEmail)?.updated,
+               updated:
+                    (providerMap.has(p.workEmail)
+                         ? providerMap.get(p.workEmail)?.updated
+                         : providerMap.get(p.personalEmail)?.updated) || false,
           })),
           total: count,
      }

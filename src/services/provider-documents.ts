@@ -3,7 +3,7 @@ import { IProviderDocument, IProviderDocumentUploadDTO } from '../types'
 import { getFileContent } from './get-files-from-sharepoint'
 
 async function uploadProviderDocument(providerDocument: IProviderDocument) {
-     const { title, kind, fileContent } = providerDocument
+     const { title, kind, fileContent, providerPk } = providerDocument
      const headers = {
           Accept: 'application/json',
           'x-api-key': apiKey!,
@@ -42,7 +42,7 @@ async function uploadProviderDocuments(
 ) {
      const workEmail = providerMap.has(providerDTO.workEmail)
      const map = providerMap.get(
-          workEmail ? providerDTO.workEmail : providerDTO.email
+          workEmail ? providerDTO.workEmail : providerDTO.personalEmail
      )
      if (!map) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
@@ -51,7 +51,8 @@ async function uploadProviderDocuments(
                providerPk: map.providerId,
                fileContent: await getFileContent(
                     'https://attainaba.sharepoint.com/sites/bi',
-                    f.path
+                    'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
+                         f.path
                ),
           }))
      )

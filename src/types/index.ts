@@ -39,7 +39,7 @@ interface IProviderDocumentUploadDTO {
           kind: string
           title: string
      }[]
-     email: string
+     personalEmail: string
      workEmail: string
 }
 
