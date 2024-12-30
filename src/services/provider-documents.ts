@@ -61,7 +61,7 @@ async function uploadProviderDocuments(
                fileContent: await getFileContent(
                     'https://attainaba.sharepoint.com/sites/bi',
                     'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
-                    f.path
+                         f.path
                ),
           }))
      )
@@ -79,7 +79,9 @@ async function getCurrentProviderDocuments(providerId: string) {
      return (res.data.results || []).map((d) => d.kind)
 }
 
-async function handleProviderDocumentsUpload(payload: IProviderDocumentUploadDTO[]) {
+async function handleProviderDocumentsUpload(
+     payload: IProviderDocumentUploadDTO[]
+) {
      const personalEmails = payload.map((p) => p.personalEmail)
      const workEmail = payload.map((p) => p.workEmail)
      const res = await getProviders({
@@ -107,4 +109,8 @@ async function handleProviderDocumentsUpload(payload: IProviderDocumentUploadDTO
      )
      return providerMap
 }
-export { uploadProviderDocuments, getCurrentProviderDocuments, handleProviderDocumentsUpload }
+export {
+     uploadProviderDocuments,
+     getCurrentProviderDocuments,
+     handleProviderDocumentsUpload,
+}

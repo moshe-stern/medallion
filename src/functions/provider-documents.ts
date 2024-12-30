@@ -1,7 +1,5 @@
 import { HttpRequest, HttpResponseInit, app } from '@azure/functions'
-import {
-     handleProviderDocumentsUpload,
-} from '../services/provider-documents'
+import { handleProviderDocumentsUpload } from '../services/provider-documents'
 import { IProviderDocumentUploadDTO } from '../types'
 
 async function providerDocumentHandler(
@@ -9,7 +7,7 @@ async function providerDocumentHandler(
 ): Promise<HttpResponseInit> {
      try {
           const payload = (await request.json()) as IProviderDocumentUploadDTO[]
-          const providerMap =  await handleProviderDocumentsUpload(payload)
+          const providerMap = await handleProviderDocumentsUpload(payload)
           return {
                body: JSON.stringify({
                     updated: payload.map((p) => ({
