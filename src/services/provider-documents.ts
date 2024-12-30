@@ -1,3 +1,4 @@
+import { getProviders } from '.'
 import { apiKey } from '..'
 import { IProviderDocument, IProviderDocumentUploadDTO } from '../types'
 import { getFileContent } from './get-files-from-sharepoint'
@@ -60,7 +61,7 @@ async function uploadProviderDocuments(
                fileContent: await getFileContent(
                     'https://attainaba.sharepoint.com/sites/bi',
                     'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
-                         f.path
+                    f.path
                ),
           }))
      )
@@ -77,4 +78,33 @@ async function getCurrentProviderDocuments(providerId: string) {
           )
      return (res.data.results || []).map((d) => d.kind)
 }
-export { uploadProviderDocuments, getCurrentProviderDocuments }
+
+async function handleProviderDocumentsUpload(payload: IProviderDocumentUploadDTO[]) {
+     const personalEmails = payload.map((p) => p.personalEmail)
+     const workEmail = payload.map((p) => p.workEmail)
+     const res = await getProviders({
+          search: [...personalEmails, ...workEmail].join(','),
+     })
+     const providers = res.results
+     if (!providers?.length) throw new Error('No Providers found')
+     const providerMap = new Map<
+          string,
+          { providerId: string; updated: boolean; currentDocs: string[] }
+     >()
+     await Promise.all(
+          providers.map(async (p) => {
+               const docs = await getCurrentProviderDocuments(p.id)
+               providerMap.set(p.email, {
+                    providerId: p.id,
+                    currentDocs: docs,
+                    updated: false,
+               })
+          })
+     )
+
+     await Promise.all(
+          payload.map((p) => uploadProviderDocuments(p, providerMap))
+     )
+     return providerMap
+}
+export { uploadProviderDocuments, getCurrentProviderDocuments, handleProviderDocumentsUpload }
