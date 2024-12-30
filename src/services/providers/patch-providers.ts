@@ -30,7 +30,7 @@ async function patchProvider(
           personalEmail,
           cityOfBirth,
           stateOfBirth,
-          // eeo1Ethnicity,
+          eeo1Ethnicity,
      } = provider
      const map = providerMap.has(workEmail)
           ? providerMap.get(workEmail)
@@ -56,6 +56,7 @@ async function patchProvider(
                          metadata_s2: metaDataS2,
                          birth_city: cityOfBirth,
                          birth_state: stateOfBirth,
+                         race: eeo1Ethnicity
                     },
                     { provider_pk: map.providerId }
                )
