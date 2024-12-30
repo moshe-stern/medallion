@@ -1,6 +1,7 @@
 import { apiKey } from '..'
 import { IProviderDocument, IProviderDocumentUploadDTO } from '../types'
 import { getFileContent } from './get-files-from-sharepoint'
+import medallionApi from '@api/medallion-api'
 
 async function uploadProviderDocument(providerDocument: IProviderDocument) {
      const { title, kind, fileContent, providerPk } = providerDocument
@@ -38,15 +39,22 @@ async function uploadProviderDocument(providerDocument: IProviderDocument) {
 
 async function uploadProviderDocuments(
      providerDTO: IProviderDocumentUploadDTO,
-     providerMap: Map<string, { providerId: string; updated: boolean }>
+     providerMap: Map<
+          string,
+          { providerId: string; updated: boolean; currentDocs: string[] }
+     >
 ) {
      const workEmail = providerMap.has(providerDTO.workEmail)
      const map = providerMap.get(
           workEmail ? providerDTO.workEmail : providerDTO.personalEmail
      )
      if (!map) return
+     const filteredProviderDocs = providerDTO.files.filter(
+          (f) => !map.currentDocs.includes(f.kind)
+     )
+     if (!filteredProviderDocs.length) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
-          providerDTO.files.map(async (f) => ({
+          filteredProviderDocs.map(async (f) => ({
                ...f,
                providerPk: map.providerId,
                fileContent: await getFileContent(
@@ -61,4 +69,12 @@ async function uploadProviderDocuments(
      )
      map.updated = res.every(Boolean)
 }
-export { uploadProviderDocuments }
+
+async function getCurrentProviderDocuments(providerId: string) {
+     const res =
+          await medallionApi.api_v1_org_providers_documents_list_providerDocuments(
+               { provider_pk: providerId }
+          )
+     return (res.data.results || []).map((d) => d.kind)
+}
+export { uploadProviderDocuments, getCurrentProviderDocuments }

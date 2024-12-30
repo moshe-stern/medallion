@@ -1,5 +1,8 @@
 import { HttpRequest, HttpResponseInit, app } from '@azure/functions'
-import { uploadProviderDocuments } from '../services/provider-documents'
+import {
+     getCurrentProviderDocuments,
+     uploadProviderDocuments,
+} from '../services/provider-documents'
 import { IProviderDocumentUploadDTO } from '../types'
 import { getProviders } from '../services'
 
@@ -17,14 +20,19 @@ async function providerDocumentHandler(
           if (!providers?.length) throw new Error('No Providers found')
           const providerMap = new Map<
                string,
-               { providerId: string; updated: boolean }
+               { providerId: string; updated: boolean; currentDocs: string[] }
           >()
-          providers.forEach((p) => {
-               providerMap.set(p.email, {
-                    providerId: p.id,
-                    updated: false,
+          await Promise.all(
+               providers.map(async (p) => {
+                    const docs = await getCurrentProviderDocuments(p.id)
+                    providerMap.set(p.email, {
+                         providerId: p.id,
+                         currentDocs: docs,
+                         updated: false,
+                    })
                })
-          })
+          )
+
           await Promise.all(
                payload.map((p) => uploadProviderDocuments(p, providerMap))
           )
