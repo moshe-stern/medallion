@@ -46,9 +46,13 @@ async function getCoveredProviders(
 async function getProviders(
      metadata?: ApiV1OrgProvidersListProvidersMetadataParam
 ) {
-     const res =
-          await medallionApi.api_v1_org_providers_list_providers(metadata)
-     return res.data
+     try {
+          const res =
+               await medallionApi.api_v1_org_providers_list_providers(metadata)
+          return res.data
+     } catch (error) {
+          console.log(error)
+     }
 }
 
 export { getCoveredProviders, getProviders }

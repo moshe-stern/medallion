@@ -87,8 +87,9 @@ async function handleProviderDocumentsUpload(
      const res = await getProviders({
           search: [...personalEmails, ...workEmail].join(','),
      })
+     if (!res?.results?.length) throw new Error('No Providers found')
      const providers = res.results
-     if (!providers?.length) throw new Error('No Providers found')
+     
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean; currentDocs: string[] }

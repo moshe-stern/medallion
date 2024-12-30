@@ -3,8 +3,8 @@ import { getProviders } from '../providers'
 
 async function handleRequiredDocumentsReport() {
      const res = await getProviders()
+     if (!res?.results?.length) return
      const { results: providers } = res
-     if (!providers) return
      const res2 = await getLicenses()
      const { results: licenses } = res2
      if (!licenses) return

@@ -23,6 +23,7 @@ async function providersHandler(
           } else if (request.method === 'PATCH') {
                const updateData =
                     (await request.json()) as IProviderUpdateData[]
+               
                if (!updateData || !updateData.length)
                     throw new Error('No provider data provided')
                if (updateData.length > 100)
@@ -33,10 +34,8 @@ async function providersHandler(
                const emailStr = request.query.get('email-string')
                const offset = +(request.query.get('offset') || 0)
                const res = await getProviders({ offset })
+               if(!res?.results?.length) throw new Error('Failed to get Providers')
                const { results: providers, count } = res
-               if (!providers) {
-                    throw new Error('Failed to get Providers')
-               }
                if (emailStr) {
                     return {
                          body: JSON.stringify({

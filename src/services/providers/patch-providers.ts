@@ -35,7 +35,9 @@ async function patchProvider(
      const map = providerMap.has(workEmail)
           ? providerMap.get(workEmail)
           : providerMap.get(personalEmail)
+     console.log(map)
      if (!map) return false
+     console.log(map)
      try {
           const res =
                await medallionApi.api_v1_org_providers_partial_update_providers(
@@ -72,8 +74,8 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
      const res = await getProviders({
           search: [...personalEmails, ...workEmail].join(','),
      })
+     if (!res?.results?.length) throw new Error('No Providers Found')    
      const { results: providers, count } = res
-     if (!providers?.length) throw new Error('No Providers Found')
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean }
