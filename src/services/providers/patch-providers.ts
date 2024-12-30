@@ -74,7 +74,7 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
      const res = await getProviders({
           search: [...personalEmails, ...workEmail].join(','),
      })
-     if (!res?.results?.length) throw new Error('No Providers Found')    
+     if (!res?.results?.length) throw new Error('No Providers Found')
      const { results: providers, count } = res
      const providerMap = new Map<
           string,

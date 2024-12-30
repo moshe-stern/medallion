@@ -89,7 +89,7 @@ async function handleProviderDocumentsUpload(
      })
      if (!res?.results?.length) throw new Error('No Providers found')
      const providers = res.results
-     
+
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean; currentDocs: string[] }
