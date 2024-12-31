@@ -1,7 +1,8 @@
 const tenantId = process.env.TENANT_ID!
 const clientId = process.env.CLIENT_ID!
 const clientSecret = process.env.CLIENT_SECRET!
-const sharepointDomainName = 'attainaba.sharepoint.com'
+const sharepointDomainName = process.env.SHARE_POINT_DOMAIN!
+const resource = process.env.RESOURCE!
 
 async function getAccessToken(): Promise<string> {
      const tokenUrl = `https://accounts.accesscontrol.windows.net/${tenantId}/tokens/OAuth/2`
@@ -9,7 +10,7 @@ async function getAccessToken(): Promise<string> {
           grant_type: 'client_credentials',
           client_id: clientId,
           client_secret: clientSecret,
-          resource: `00000003-0000-0ff1-ce00-000000000000/${sharepointDomainName}@${tenantId}`,
+          resource: `${resource}/${sharepointDomainName}@${tenantId}`,
      })
 
      try {

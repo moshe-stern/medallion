@@ -73,7 +73,7 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
           search: [...personalEmails, ...workEmail].join(','),
      })
      if (!res?.results?.length) throw new Error('No Providers Found')
-     const { results: providers, count } = res
+     const { results: providers } = res
      const providerMap = new Map<
           string,
           { providerId: string; updated: boolean }
@@ -89,8 +89,7 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
                     (providerMap.has(p.workEmail)
                          ? providerMap.get(p.workEmail)?.updated
                          : providerMap.get(p.personalEmail)?.updated) || false,
-          })),
-          total: count,
+          }))
      }
 }
 
