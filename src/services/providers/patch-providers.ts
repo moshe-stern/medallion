@@ -89,7 +89,7 @@ async function patchProviders(providerData: IProviderUpdateData[]) {
                     (providerMap.has(p.workEmail)
                          ? providerMap.get(p.workEmail)?.updated
                          : providerMap.get(p.personalEmail)?.updated) || false,
-          }))
+          })),
      }
 }
 
