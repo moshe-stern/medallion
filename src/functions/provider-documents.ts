@@ -11,15 +11,19 @@ async function providerDocumentHandler(
           return {
                body: JSON.stringify({
                     updated: payload.map((p) => {
-                         const map = providerMap.get(p.workEmail) || providerMap.get(p.personalEmail)
+                         const map =
+                              providerMap.get(p.workEmail) ||
+                              providerMap.get(p.personalEmail)
                          const results = {
                               ...p,
                               providerId: map?.providerId,
-                              files: p.files.map(f => ({
+                              files: p.files.map((f) => ({
                                    ...f,
-                                   id: map?.currentDocs.find(d => d.kind === f.kind)?.id
+                                   id: map?.currentDocs.find(
+                                        (d) => d.kind === f.kind
+                                   )?.id,
                               })),
-                              updated: map?.updated || false
+                              updated: map?.updated || false,
                          }
                          return results
                     }),

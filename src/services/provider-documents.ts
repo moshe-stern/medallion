@@ -36,14 +36,23 @@ async function uploadProviderDocument(providerDocument: IProviderDocument) {
                return false
           }
      }
-     return id ? medallionApi.api_v1_org_providers_documents_partial_update_providerDocuments({ title }, { provider_pk: providerPk, id: id! }) : sendFile()
+     return id
+          ? medallionApi.api_v1_org_providers_documents_partial_update_providerDocuments(
+                 { title },
+                 { provider_pk: providerPk, id: id! }
+            )
+          : sendFile()
 }
 
 async function updateProviderDocuments(
      providerDTO: IProviderDocumentUploadDTO,
      providerMap: Map<
           string,
-          { providerId: string; updated: boolean; currentDocs: { id: string, kind: string }[] }
+          {
+               providerId: string
+               updated: boolean
+               currentDocs: { id: string; kind: string }[]
+          }
      >
 ) {
      const workEmail = providerMap.has(providerDTO.workEmail)
@@ -53,16 +62,19 @@ async function updateProviderDocuments(
      if (!map) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
           providerDTO.files.map(async (f) => {
-               const id = map.currentDocs.find(d => d.kind === f.kind)?.id
+               const id = map.currentDocs.find((d) => d.kind === f.kind)?.id
                const payload = {
                     ...f,
                     id,
                     providerPk: map.providerId,
-                    fileContent: !id && await getFileContent(
-                         'https://attainaba.sharepoint.com/sites/bi',
-                         'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
-                         f.path
-                    ) || undefined
+                    fileContent:
+                         (!id &&
+                              (await getFileContent(
+                                   'https://attainaba.sharepoint.com/sites/bi',
+                                   'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
+                                        f.path
+                              ))) ||
+                         undefined,
                }
                return payload
           })
@@ -80,7 +92,7 @@ async function getCurrentProviderDocuments(providerId: string) {
           )
      return (res.data.results || []).map((d) => ({
           kind: d.kind,
-          id: d.id
+          id: d.id,
      }))
 }
 
@@ -97,7 +109,11 @@ async function handleProviderDocumentsUpload(
 
      const providerMap = new Map<
           string,
-          { providerId: string; updated: boolean; currentDocs: { id: string, kind: string }[] }
+          {
+               providerId: string
+               updated: boolean
+               currentDocs: { id: string; kind: string }[]
+          }
      >()
      await Promise.all(
           providers.map(async (p) => {
