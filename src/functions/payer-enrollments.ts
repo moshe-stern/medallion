@@ -1,52 +1,18 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
 import { createEnrollments } from '../services/payer-enrollments'
-import { groupBy, map, mapValues } from 'lodash'
 import { Enrollment } from '../types'
 
 async function handlePayerEnrollments(
      request: HttpRequest
 ): Promise<HttpResponseInit> {
      try {
-          const data = (await request.json()) as {
-               enrollments: {
-                    Payor: string
-                    ServiceAddress: string
-                    Entity: string
-               }[]
+          const data = await request.json() as {
+               enrollments: Enrollment[],
                state: string
           }
-          const mappedEnrollments: Enrollment[] = data.enrollments.map(
-               (enroll) => ({
-                    payerName: enroll.Payor.trim(),
-                    practiceNames: [enroll.ServiceAddress.trim()],
-                    entity: enroll.Entity.trim(),
-               })
-          )
-          const grouped = mapValues(
-               groupBy(mappedEnrollments, 'payerName'),
-               (payorGroup) =>
-                    payorGroup.map((item) => ({
-                         practices: item.practiceNames,
-                         entity: item.entity,
-                    }))
-          )
-          const mappedGroup: Enrollment[] = map(
-               grouped,
-               (group, payerName) => ({
-                    payerName,
-                    practiceNames: group.flatMap((g) => g.practices),
-                    entity: group[0].entity,
-               })
-          )
-          const enrollments = await createEnrollments(mappedGroup, data.state)
-          if (!enrollments) {
-               throw new Error('Failed to create Enrollments')
-          }
           return {
-               status: 201,
-               body: JSON.stringify({
-                    message: 'Successfully created Enrollments',
-               }),
+               status: 200,
+               body: JSON.stringify(await createEnrollments(data.enrollments, data.state))
           }
      } catch (error) {
           return {

@@ -35,9 +35,7 @@ async function patchProvider(
      const map = providerMap.has(workEmail)
           ? providerMap.get(workEmail)
           : providerMap.get(personalEmail)
-     console.log(map)
      if (!map) return false
-     console.log(map)
      try {
           const res =
                await medallionApi.api_v1_org_providers_partial_update_providers(

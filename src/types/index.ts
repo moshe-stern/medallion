@@ -1,10 +1,11 @@
 interface Enrollment {
+     id?: string
      payerName: string
      practiceNames: string[]
-     hasNonCompliantBcba?: boolean
-     coveredRegions?: string[]
+     hasNonCompliantBcba: boolean
+     coveredRegions: string[]
      entity?: string
-     linesOfBusiness?: string[]
+     linesOfBusiness: string[] | IBusinessLine[]
 }
 
 enum EReportType {
@@ -12,6 +13,10 @@ enum EReportType {
      PAYER_LIST = 'PAYER_LIST',
 }
 
+interface IBusinessLine {
+     id: string;
+     label: string;
+ }
 interface IProviderUpdateData {
      employeeCode: string
      employeeNumber: string
@@ -55,4 +60,5 @@ export {
      IProviderUpdateData,
      IProviderDocumentUploadDTO,
      IProviderDocument,
+     IBusinessLine
 }

@@ -10,7 +10,7 @@ async function medallionPagination<T>(
      const urlSearchParams = new URLSearchParams(searchParams)
      const queryString = urlSearchParams.toString()
      try {
-          const res = await doFetch(url + '?' + queryString)
+          const res = await doFetch(BASE_URL + url + '?' + queryString)
           const data = (await res.json()) as { count?: number; results?: T[] }
           const count = data.count
           vals.push(...(data.results || []))
@@ -20,7 +20,7 @@ async function medallionPagination<T>(
           for (let i = 0; i < iterate; i++) {
                pagination.offset += 100
                const paginationQuery = `?limit=${pagination.limit}&offset=${pagination.offset}`
-               promises.push(doFetch(url + paginationQuery + '&' + queryString))
+               promises.push(doFetch(BASE_URL + url + paginationQuery + '&' + queryString))
           }
           const resolved = await Promise.all(promises)
           const resolvedJson = await Promise.all(

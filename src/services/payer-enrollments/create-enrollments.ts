@@ -1,10 +1,11 @@
 import medallionApi from '@api/medallion-api'
 import { ApiV1OrgProvidersListProvidersMetadataParam } from '@api/medallion-api/types'
 import { Enrollment } from '../../types'
-import { filterEnrollments } from './filter-enrollments'
+import { getExistingEnrollments } from './enrollment-helpers'
 import { enrollmentAndPracticePromise } from './enrollment-practice-promise'
 import { getGroupProfileIdByName } from '../group-profiles'
 import { handlePracticeAndProviderMapCreationForEnrollments } from '../practices'
+import { getLinesOfBusiness } from '../lines-of-business'
 
 async function createEnrollments(enrollments: Enrollment[], state: string) {
      if (!state?.length) throw new Error('No State Provided')
@@ -15,35 +16,36 @@ async function createEnrollments(enrollments: Enrollment[], state: string) {
      })
      const providers = res.data.results
      if (!providers?.length) throw new Error('Providers not found in State')
-     let nonExistentEnrollments = await filterEnrollments(
-          providers,
-          enrollments,
-          state
-     )
-     nonExistentEnrollments = await Promise.all(
-          nonExistentEnrollments.map(async (e) => ({
+     const existingEnrollments = await getExistingEnrollments(providers, state)
+     const businesses = await getLinesOfBusiness();
+     enrollments = await Promise.all(
+          enrollments.map(async (e) => ({
                ...e,
+               id: existingEnrollments.find(existing => e.payerName === existing.payerName)?.id,
                entity: await getGroupProfileIdByName(e.entity),
+               linesOfBusiness: businesses.filter(b => (e.linesOfBusiness as string[]).includes(b.label))
           }))
      )
      const providerMap =
           await handlePracticeAndProviderMapCreationForEnrollments(
-               nonExistentEnrollments,
+               enrollments,
                state,
                providers
           )
      const enrollmentPromises = await Promise.all(
-          nonExistentEnrollments.map((enrollment) =>
-               createEnrollment(
+          enrollments.map(async (enrollment) => ({
+               ...enrollment,
+               updated: await createEnrollment(
                     enrollment,
                     state,
                     providerMap.get(enrollment) || []
                )
+          })
+
           )
      )
-     if (!enrollmentPromises.length) throw new Error('No Enrollments to Create')
      const resolved = await Promise.all(enrollmentPromises)
-     return resolved.every(Boolean)
+     return resolved
 }
 
 async function createEnrollment(

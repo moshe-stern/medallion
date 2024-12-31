@@ -4,12 +4,11 @@ import { Enrollment } from '../../types'
 import medallionApi from '@api/medallion-api'
 import { FetchResponse } from 'api/dist/core'
 
-export async function filterEnrollments(
+async function getExistingEnrollments(
      providers: FetchResponse<
           200,
           ApiV1OrgProvidersListProvidersResponse200
      >['data']['results'],
-     enrollments: Enrollment[],
      state: string
 ) {
      const existingEnrollmentsResponses = await Promise.all(
@@ -23,20 +22,18 @@ export async function filterEnrollments(
                return res.data.results
           })
      )
-     const resolvedEnrollments = existingEnrollmentsResponses
+     return existingEnrollmentsResponses
           .flat()
           .filter((e) => e?.state === state)
           .map((exist) => ({
+               id: exist?.id,
                payerName: exist?.payer_name,
                practiceNames: exist?.practices?.map((pract) => pract.name),
                entity: exist?.par_group,
           }))
-     const filtered = filter(
-          enrollments,
-          (enrollment) =>
-               !resolvedEnrollments.find(
-                    (e) => e.payerName === enrollment.payerName
-               )
-     )
-     return filtered
+}
+
+
+export {
+     getExistingEnrollments
 }

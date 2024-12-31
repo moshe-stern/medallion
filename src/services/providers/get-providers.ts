@@ -19,7 +19,7 @@ async function getCoveredProviders(
           200,
           ApiV1OrgProvidersListProvidersResponse200
      >['data']['results'] = []
-     if (enrollment.coveredRegions) {
+     if (enrollment.coveredRegions.length) {
           const dbProviders = await getProvidersByEmail(
                (providers || []).map((prov) => prov.email)
           )
@@ -51,7 +51,7 @@ async function getProviders(
                await medallionApi.api_v1_org_providers_list_providers(metadata)
           return res.data
      } catch (error) {
-          console.log(error)
+          console.error(error)
      }
 }
 
