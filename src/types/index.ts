@@ -15,6 +15,7 @@ enum EReportType {
 
 interface IBusinessLine {
      id: string
+     [x: string]: unknown
      label: string
 }
 interface IProviderUpdateData {
@@ -49,7 +50,8 @@ interface IProviderDocumentUploadDTO {
 }
 
 interface IProviderDocument {
-     fileContent: Blob
+     id?: string
+     fileContent?: Blob
      providerPk: string
      kind: string
      title: string

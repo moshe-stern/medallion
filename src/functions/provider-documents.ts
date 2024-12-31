@@ -10,14 +10,19 @@ async function providerDocumentHandler(
           const providerMap = await handleProviderDocumentsUpload(payload)
           return {
                body: JSON.stringify({
-                    updated: payload.map((p) => ({
-                         ...p,
-                         updated:
-                              (providerMap.has(p.workEmail)
-                                   ? providerMap.get(p.workEmail)?.updated
-                                   : providerMap.get(p.personalEmail)
-                                          ?.updated) || false,
-                    })),
+                    updated: payload.map((p) => {
+                         const map = providerMap.get(p.workEmail) || providerMap.get(p.personalEmail)
+                         const results = {
+                              ...p,
+                              providerId: map?.providerId,
+                              files: p.files.map(f => ({
+                                   ...f,
+                                   id: map?.currentDocs.find(d => d.kind === f.kind)?.id
+                              })),
+                              updated: map?.updated || false
+                         }
+                         return results
+                    }),
                }),
           }
      } catch (error) {

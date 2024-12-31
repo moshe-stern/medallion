@@ -5,16 +5,17 @@ import { getFileContent } from './get-files-from-sharepoint'
 import medallionApi from '@api/medallion-api'
 
 async function uploadProviderDocument(providerDocument: IProviderDocument) {
-     const { title, kind, fileContent, providerPk } = providerDocument
-     const headers = {
-          Accept: 'application/json',
-          'x-api-key': apiKey!,
-     }
-     const formData = new FormData()
-     formData.append('title', title)
-     formData.append('kind', kind)
-     formData.append('content', fileContent)
+     const { title, kind, fileContent, providerPk, id } = providerDocument
+
      const sendFile = async () => {
+          const headers = {
+               Accept: 'application/json',
+               'x-api-key': apiKey!,
+          }
+          const formData = new FormData()
+          formData.append('title', title)
+          formData.append('kind', kind)
+          formData.append('content', fileContent!)
           try {
                const response = await fetch(
                     `https://api.medallion.co/api/v1/org/providers/${providerPk}/documents/`,
@@ -35,14 +36,14 @@ async function uploadProviderDocument(providerDocument: IProviderDocument) {
                return false
           }
      }
-     return sendFile()
+     return id ? medallionApi.api_v1_org_providers_documents_partial_update_providerDocuments({ title }, { provider_pk: providerPk, id: id! }) : sendFile()
 }
 
-async function uploadProviderDocuments(
+async function updateProviderDocuments(
      providerDTO: IProviderDocumentUploadDTO,
      providerMap: Map<
           string,
-          { providerId: string; updated: boolean; currentDocs: string[] }
+          { providerId: string; updated: boolean; currentDocs: { id: string, kind: string }[] }
      >
 ) {
      const workEmail = providerMap.has(providerDTO.workEmail)
@@ -50,20 +51,21 @@ async function uploadProviderDocuments(
           workEmail ? providerDTO.workEmail : providerDTO.personalEmail
      )
      if (!map) return
-     const filteredProviderDocs = providerDTO.files.filter(
-          (f) => !map.currentDocs.includes(f.kind)
-     )
-     if (!filteredProviderDocs.length) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
-          filteredProviderDocs.map(async (f) => ({
-               ...f,
-               providerPk: map.providerId,
-               fileContent: await getFileContent(
-                    'https://attainaba.sharepoint.com/sites/bi',
-                    'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
+          providerDTO.files.map(async (f) => {
+               const id = map.currentDocs.find(d => d.kind === f.kind)?.id
+               const payload = {
+                    ...f,
+                    id,
+                    providerPk: map.providerId,
+                    fileContent: !id && await getFileContent(
+                         'https://attainaba.sharepoint.com/sites/bi',
+                         'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
                          f.path
-               ),
-          }))
+                    ) || undefined
+               }
+               return payload
+          })
      )
      const res = await Promise.all(
           providerDocuments.map((d) => uploadProviderDocument(d))
@@ -76,7 +78,10 @@ async function getCurrentProviderDocuments(providerId: string) {
           await medallionApi.api_v1_org_providers_documents_list_providerDocuments(
                { provider_pk: providerId }
           )
-     return (res.data.results || []).map((d) => d.kind)
+     return (res.data.results || []).map((d) => ({
+          kind: d.kind,
+          id: d.id
+     }))
 }
 
 async function handleProviderDocumentsUpload(
@@ -92,7 +97,7 @@ async function handleProviderDocumentsUpload(
 
      const providerMap = new Map<
           string,
-          { providerId: string; updated: boolean; currentDocs: string[] }
+          { providerId: string; updated: boolean; currentDocs: { id: string, kind: string }[] }
      >()
      await Promise.all(
           providers.map(async (p) => {
@@ -106,12 +111,12 @@ async function handleProviderDocumentsUpload(
      )
 
      await Promise.all(
-          payload.map((p) => uploadProviderDocuments(p, providerMap))
+          payload.map((p) => updateProviderDocuments(p, providerMap))
      )
      return providerMap
 }
 export {
-     uploadProviderDocuments,
+     updateProviderDocuments,
      getCurrentProviderDocuments,
      handleProviderDocumentsUpload,
 }
