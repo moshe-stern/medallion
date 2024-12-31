@@ -17,13 +17,17 @@ async function createEnrollments(enrollments: Enrollment[], state: string) {
      const providers = res.data.results
      if (!providers?.length) throw new Error('Providers not found in State')
      const existingEnrollments = await getExistingEnrollments(providers, state)
-     const businesses = await getLinesOfBusiness();
+     const businesses = await getLinesOfBusiness()
      enrollments = await Promise.all(
           enrollments.map(async (e) => ({
                ...e,
-               id: existingEnrollments.find(existing => e.payerName === existing.payerName)?.id,
+               id: existingEnrollments.find(
+                    (existing) => e.payerName === existing.payerName
+               )?.id,
                entity: await getGroupProfileIdByName(e.entity),
-               linesOfBusiness: businesses.filter(b => (e.linesOfBusiness as string[]).includes(b.label))
+               linesOfBusiness: businesses.filter((b) =>
+                    (e.linesOfBusiness as string[]).includes(b.label)
+               ),
           }))
      )
      const providerMap =
@@ -39,10 +43,8 @@ async function createEnrollments(enrollments: Enrollment[], state: string) {
                     enrollment,
                     state,
                     providerMap.get(enrollment) || []
-               )
-          })
-
-          )
+               ),
+          }))
      )
      const resolved = await Promise.all(enrollmentPromises)
      return resolved

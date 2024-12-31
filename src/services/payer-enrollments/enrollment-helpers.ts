@@ -1,6 +1,4 @@
 import { ApiV1OrgProvidersListProvidersResponse200 } from '@api/medallion-api/types'
-import { filter } from 'lodash'
-import { Enrollment } from '../../types'
 import medallionApi from '@api/medallion-api'
 import { FetchResponse } from 'api/dist/core'
 
@@ -33,7 +31,4 @@ async function getExistingEnrollments(
           }))
 }
 
-
-export {
-     getExistingEnrollments
-}
+export { getExistingEnrollments }

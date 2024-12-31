@@ -8,7 +8,8 @@ export async function enrollmentAndPracticePromise(
      enrollment: Enrollment,
      state: string
 ) {
-     const { practiceNames, payerName, entity, linesOfBusiness, id } = enrollment
+     const { practiceNames, payerName, entity, linesOfBusiness, id } =
+          enrollment
      try {
           const providerPractices =
                await medallionApi.api_v1_org_provider_practice_associations_list_practices(
@@ -28,15 +29,19 @@ export async function enrollmentAndPracticePromise(
                practices: filteredPractices,
                provider: providerId,
                is_medallion_owned: true,
-               resourcetype:
-                    'NewProviderPayerEnrollmentServiceRequest',
+               resourcetype: 'NewProviderPayerEnrollmentServiceRequest',
                state: state as PApiV1ServiceRequestsPayerEnrollmentsCreatePayerEnrollmentServiceRequestsBodyParam['state'],
           }
-          const res2 = id ?
-               await medallionApi.p_api_v1_service_requests_payer_enrollments_partial_update_payerEnrollmentServiceRequests({
-                    ...payload,
-               }, { id }) :
-               await medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(payload)
+          const res2 = id
+               ? await medallionApi.p_api_v1_service_requests_payer_enrollments_partial_update_payerEnrollmentServiceRequests(
+                      {
+                           ...payload,
+                      },
+                      { id }
+                 )
+               : await medallionApi.p_api_v1_service_requests_payer_enrollments_create_payerEnrollmentServiceRequests(
+                      payload
+                 )
           return res2
      } catch (error) {
           console.error(error)

@@ -6,13 +6,15 @@ async function handlePayerEnrollments(
      request: HttpRequest
 ): Promise<HttpResponseInit> {
      try {
-          const data = await request.json() as {
-               enrollments: Enrollment[],
+          const data = (await request.json()) as {
+               enrollments: Enrollment[]
                state: string
           }
           return {
                status: 200,
-               body: JSON.stringify(await createEnrollments(data.enrollments, data.state))
+               body: JSON.stringify(
+                    await createEnrollments(data.enrollments, data.state)
+               ),
           }
      } catch (error) {
           return {

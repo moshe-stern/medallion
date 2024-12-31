@@ -14,9 +14,9 @@ enum EReportType {
 }
 
 interface IBusinessLine {
-     id: string;
-     label: string;
- }
+     id: string
+     label: string
+}
 interface IProviderUpdateData {
      employeeCode: string
      employeeNumber: string
@@ -60,5 +60,5 @@ export {
      IProviderUpdateData,
      IProviderDocumentUploadDTO,
      IProviderDocument,
-     IBusinessLine
+     IBusinessLine,
 }
