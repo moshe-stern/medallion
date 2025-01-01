@@ -32,7 +32,7 @@ async function patchProvider(provider: IProviderUpdateData) {
                          employment_type: dolStatus,
                          gender,
                          line_1: street,
-                         line_2: streetLine2,
+                         line_2: streetLine2 || '',
                          city,
                          address_state: state,
                          postal_code: zipcode,
