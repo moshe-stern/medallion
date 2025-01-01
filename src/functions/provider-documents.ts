@@ -11,9 +11,7 @@ async function providerDocumentHandler(
           return {
                body: JSON.stringify({
                     updated: payload.map((p) => {
-                         const map =
-                              providerMap.get(p.workEmail) ||
-                              providerMap.get(p.personalEmail)
+                         const map = providerMap.get(p.providerId)
                          const results = {
                               ...p,
                               providerId: map?.providerId,

@@ -1,16 +1,8 @@
 import medallionApi from '@api/medallion-api'
 import { IProviderUpdateData } from '../../types'
-import { getProviders } from '.'
 
 async function patchProvider(
-     provider: IProviderUpdateData,
-     providerMap: Map<
-          string,
-          {
-               providerId: string
-               updated: boolean
-          }
-     >
+     provider: IProviderUpdateData
 ) {
      const {
           position,
@@ -26,16 +18,11 @@ async function patchProvider(
           primaryPhone,
           metaDataS1,
           metaDataS2,
-          workEmail,
-          personalEmail,
+          id,
           cityOfBirth,
           stateOfBirth,
           eeo1Ethnicity,
      } = provider
-     const map = providerMap.has(workEmail)
-          ? providerMap.get(workEmail)
-          : providerMap.get(personalEmail)
-     if (!map) return false
      try {
           const res =
                await medallionApi.api_v1_org_providers_partial_update_providers(
@@ -58,39 +45,19 @@ async function patchProvider(
                          birth_state: stateOfBirth,
                          race: eeo1Ethnicity,
                     },
-                    { provider_pk: map.providerId }
+                    { provider_pk: id }
                )
-          map.updated = res.res.ok
+          return {
+               ...provider,
+               updated: res.res.ok,
+          }
      } catch (error) {
           console.error(error)
      }
 }
 
 async function patchProviders(providerData: IProviderUpdateData[]) {
-     const personalEmails = providerData.map((p) => p.personalEmail)
-     const workEmail = providerData.map((p) => p.workEmail)
-     const res = await getProviders({
-          search: [...personalEmails, ...workEmail].join(','),
-     })
-     if (!res?.results?.length) throw new Error('No Providers Found')
-     const { results: providers } = res
-     const providerMap = new Map<
-          string,
-          { providerId: string; updated: boolean }
-     >()
-     providers.forEach((p) => {
-          providerMap.set(p?.email, { providerId: p.id, updated: false })
-     })
-     await Promise.all(providerData.map((p) => patchProvider(p, providerMap)))
-     return {
-          updated: providerData.map((p) => ({
-               ...p,
-               updated:
-                    (providerMap.has(p.workEmail)
-                         ? providerMap.get(p.workEmail)?.updated
-                         : providerMap.get(p.personalEmail)?.updated) || false,
-          })),
-     }
+     return await Promise.all(providerData.map((p) => patchProvider(p)))
 }
 
 export { patchProvider, patchProviders }

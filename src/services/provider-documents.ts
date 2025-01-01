@@ -1,4 +1,3 @@
-import { getProviders } from '.'
 import { apiKey } from '..'
 import { IProviderDocument, IProviderDocumentUploadDTO } from '../types'
 import { getFileContent } from './get-files-from-sharepoint'
@@ -55,9 +54,8 @@ async function updateProviderDocuments(
           }
      >
 ) {
-     const workEmail = providerMap.has(providerDTO.workEmail)
      const map = providerMap.get(
-          workEmail ? providerDTO.workEmail : providerDTO.personalEmail
+          providerDTO.providerId
      )
      if (!map) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
@@ -99,13 +97,6 @@ async function getCurrentProviderDocuments(providerId: string) {
 async function handleProviderDocumentsUpload(
      payload: IProviderDocumentUploadDTO[]
 ) {
-     const personalEmails = payload.map((p) => p.personalEmail)
-     const workEmail = payload.map((p) => p.workEmail)
-     const res = await getProviders({
-          search: [...personalEmails, ...workEmail].join(','),
-     })
-     if (!res?.results?.length) throw new Error('No Providers found')
-     const providers = res.results
 
      const providerMap = new Map<
           string,
@@ -116,10 +107,10 @@ async function handleProviderDocumentsUpload(
           }
      >()
      await Promise.all(
-          providers.map(async (p) => {
-               const docs = await getCurrentProviderDocuments(p.id)
-               providerMap.set(p.email, {
-                    providerId: p.id,
+          payload.map(async (p) => {
+               const docs = await getCurrentProviderDocuments(p.providerId)
+               providerMap.set(p.providerId, {
+                    providerId: p.providerId,
                     currentDocs: docs,
                     updated: false,
                })

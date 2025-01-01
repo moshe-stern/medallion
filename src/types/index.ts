@@ -19,12 +19,11 @@ interface IBusinessLine {
      label: string
 }
 interface IProviderUpdateData {
+     id: string
      employeeCode: string
      employeeNumber: string
      employeeStatus: string
      position: string
-     workEmail: string
-     personalEmail: string
      dolStatus: string
      primaryPhone: string
      street: string
@@ -45,8 +44,7 @@ interface IProviderDocumentUploadDTO {
           kind: string
           title: string
      }[]
-     personalEmail: string
-     workEmail: string
+     providerId: string
 }
 
 interface IProviderDocument {
