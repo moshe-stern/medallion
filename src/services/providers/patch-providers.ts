@@ -1,9 +1,7 @@
 import medallionApi from '@api/medallion-api'
 import { IProviderUpdateData } from '../../types'
 
-async function patchProvider(
-     provider: IProviderUpdateData
-) {
+async function patchProvider(provider: IProviderUpdateData) {
      const {
           position,
           employeeCode,

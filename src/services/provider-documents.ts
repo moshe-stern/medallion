@@ -54,9 +54,7 @@ async function updateProviderDocuments(
           }
      >
 ) {
-     const map = providerMap.get(
-          providerDTO.providerId
-     )
+     const map = providerMap.get(providerDTO.providerId)
      if (!map) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
           providerDTO.files.map(async (f) => {
@@ -97,7 +95,6 @@ async function getCurrentProviderDocuments(providerId: string) {
 async function handleProviderDocumentsUpload(
      payload: IProviderDocumentUploadDTO[]
 ) {
-
      const providerMap = new Map<
           string,
           {
