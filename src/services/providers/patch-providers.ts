@@ -21,6 +21,7 @@ async function patchProvider(provider: IProviderUpdateData) {
           stateOfBirth,
           eeo1Ethnicity,
      } = provider
+     let updated = false
      try {
           const res =
                await medallionApi.api_v1_org_providers_partial_update_providers(
@@ -45,12 +46,13 @@ async function patchProvider(provider: IProviderUpdateData) {
                     },
                     { provider_pk: id }
                )
-          return {
-               ...provider,
-               updated: res.res.ok,
-          }
+          updated = res.res.ok
      } catch (error) {
           console.error(error)
+     }
+     return {
+          ...provider,
+          updated,
      }
 }
 
