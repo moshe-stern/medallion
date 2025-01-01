@@ -36,10 +36,12 @@ async function uploadProviderDocument(providerDocument: IProviderDocument) {
           }
      }
      return id
-          ? medallionApi.api_v1_org_providers_documents_partial_update_providerDocuments(
-               { title },
-               { provider_pk: providerPk, id: id! }
-          ).then(r => r.res.ok)
+          ? medallionApi
+                 .api_v1_org_providers_documents_partial_update_providerDocuments(
+                      { title },
+                      { provider_pk: providerPk, id: id! }
+                 )
+                 .then((r) => r.res.ok)
           : sendFile()
 }
 
@@ -68,7 +70,7 @@ async function updateProviderDocuments(
                               (await getFileContent(
                                    'https://attainaba.sharepoint.com/sites/bi',
                                    'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
-                                   f.path
+                                        f.path
                               ))) ||
                          undefined,
                }
