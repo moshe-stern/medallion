@@ -40,9 +40,9 @@ async function patchProvider(provider: IProviderUpdateData) {
                          primary_phone: primaryPhone,
                          metadata_s1: metaDataS1,
                          metadata_s2: metaDataS2,
-                         birth_city: cityOfBirth,
-                         birth_state: stateOfBirth,
-                         race: eeo1Ethnicity,
+                         birth_city: cityOfBirth || "",
+                         birth_state: stateOfBirth || '',
+                         race: eeo1Ethnicity || '',
                     },
                     { provider_pk: id }
                )
