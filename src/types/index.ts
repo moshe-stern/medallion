@@ -67,5 +67,5 @@ export {
      IProviderDocumentUploadDTO,
      IProviderDocument,
      IBusinessLine,
-     ILicensePatchDTO
+     ILicensePatchDTO,
 }
