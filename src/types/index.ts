@@ -54,6 +54,12 @@ interface IProviderDocument {
      kind: string
      title: string
 }
+
+interface ILicensePatchDTO {
+     id: string
+     document: string
+}
+
 export {
      Enrollment,
      EReportType,
@@ -61,4 +67,5 @@ export {
      IProviderDocumentUploadDTO,
      IProviderDocument,
      IBusinessLine,
+     ILicensePatchDTO
 }
