@@ -7,7 +7,7 @@ import {
 } from './create-practices'
 import { FetchResponse } from 'api/dist/core'
 
-export async function handlePracticeAndProviderMapCreationForEnrollments(
+export async function createNonExistentPracticesInProvidersForEnrollments(
      enrollments: Enrollment[],
      state: string,
      providers: FetchResponse<
@@ -19,16 +19,17 @@ export async function handlePracticeAndProviderMapCreationForEnrollments(
      const uniquePracticeNames = Array.from(
           new Set(enrollments.flatMap((enroll) => enroll.practiceNames))
      )
-     await createNonExistentPractices(state, uniquePracticeNames)
-     await Promise.all(
-          enrollments.map(async (e) => {
-               const provider = await getCoveredProviders(e, providers)
-               providerMap.set(
-                    e,
-                    (provider || []).map((p) => p.id)
-               )
-          })
-     )
+     const setProviders = async (e: Enrollment) => {
+          const provider = await getCoveredProviders(e, providers)
+          providerMap.set(
+               e,
+               (provider || []).map((p) => p.id)
+          )
+     }
+     await Promise.all([
+          createNonExistentPractices(state, uniquePracticeNames),
+          enrollments.map(setProviders),
+     ])
      const providerIds = Array.from(new Set([...providerMap.values()].flat()))
      await Promise.all(
           providerIds.map((p) =>

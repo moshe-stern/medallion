@@ -10,6 +10,11 @@ async function handlePayerEnrollments(
                enrollments: Enrollment[]
                state: string
           }
+          if (!data || !data.enrollments || !data.state) {
+               return {
+                    status: 400,
+               }
+          }
           return {
                status: 200,
                body: JSON.stringify(

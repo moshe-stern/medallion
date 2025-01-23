@@ -26,7 +26,7 @@ async function getCoveredProviders(
           const grouped = groupBy(dbProviders, 'email')
           const coveredProviders = filter(providers, (prov) =>
                every(
-                    grouped[prov.email].map((group) => group.subRegion),
+                    (grouped[prov.email] || []).map((group) => group.subRegion),
                     (region) => includes(enrollment.coveredRegions, region)
                )
           )

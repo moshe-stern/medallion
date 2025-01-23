@@ -9,18 +9,19 @@ async function getExistingEnrollments(
      >['data']['results'],
      state: string
 ) {
-     const existingEnrollmentsResponses = await Promise.all(
-          (providers || []).map(async (provider) => {
-               const res =
-                    await medallionApi.p_api_v1_service_requests_payer_enrollments_list_payerEnrollmentServiceRequests(
-                         {
-                              provider: provider.id,
-                         }
-                    )
-               return res.data.results
-          })
+     return (
+          await Promise.all(
+               (providers || []).map((p) =>
+                    medallionApi
+                         .p_api_v1_service_requests_payer_enrollments_list_payerEnrollmentServiceRequests(
+                              {
+                                   provider: p.id,
+                              }
+                         )
+                         .then((res) => res.data.results)
+               )
+          )
      )
-     return existingEnrollmentsResponses
           .flat()
           .filter((e) => e?.state === state)
           .map((exist) => ({

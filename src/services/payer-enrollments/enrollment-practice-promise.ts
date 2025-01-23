@@ -19,7 +19,9 @@ export async function enrollmentAndPracticePromise(
                     }
                )
           const filteredPractices = filter(
-               providerPractices.data.results?.map((pract) => pract.practice),
+               (providerPractices.data.results || []).map(
+                    (pract) => pract.practice
+               ),
                (pract) => includes(practiceNames, pract.name)
           )
           const payload = {
