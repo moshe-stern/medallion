@@ -44,7 +44,7 @@ async function handlePayerEnrollments(
                const updated = await updateMissingPayerEnrollmentTable(flat)
                return {
                     body: JSON.stringify({
-                         updated: updated?.ok
+                         updated: updated?.ok,
                     }),
                }
           } else {
