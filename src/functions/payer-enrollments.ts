@@ -4,22 +4,26 @@ import {
      getMissingEnrollments,
 } from '../services/payer-enrollments'
 import { Enrollment } from '../types'
-import { medallionPagination } from '../services'
+import {
+     deletMissingPayerEnrollmentTable,
+     getPayerEnrollmentsStates,
+     updateMissingPayerEnrollmentTable,
+} from '../services/medallion-dataset'
 
 async function handlePayerEnrollments(
      request: HttpRequest
 ): Promise<HttpResponseInit> {
      try {
-          const data = (await request.json()) as {
-               enrollments: Enrollment[]
-               state: string
-          }
-          if (!data || !data.enrollments || !data.state) {
-               return {
-                    status: 400,
-               }
-          }
           if (request.method === 'POST') {
+               const data = (await request.json()) as {
+                    enrollments: Enrollment[]
+                    state: string
+               }
+               if (!data || !data.enrollments || !data.state) {
+                    return {
+                         status: 400,
+                    }
+               }
                return {
                     status: 200,
                     body: JSON.stringify(
@@ -27,23 +31,21 @@ async function handlePayerEnrollments(
                     ),
                }
           } else if (request.method === 'GET') {
-               const providers = await medallionPagination<{ id: string }>(
-                    'org/providers',
-                    { state: data.state }
+               const states = await getPayerEnrollmentsStates().then((r) =>
+                    (r || []).map((r) => {
+                         return r['Payer_Enrollments_States[State]']
+                    })
                )
+               const res = await Promise.all(
+                    states.map((s) => getMissingEnrollments(s))
+               )
+               const flat = res.flat(1)
+               await deletMissingPayerEnrollmentTable()
+               const updated = await updateMissingPayerEnrollmentTable(flat)
                return {
-                    status: 200,
-                    body: JSON.stringify(
-                         await Promise.all(
-                              providers.map((p) =>
-                                   getMissingEnrollments(
-                                        p,
-                                        data.state,
-                                        data.enrollments
-                                   )
-                              )
-                         )
-                    ),
+                    body: JSON.stringify({
+                         updated: updated?.ok
+                    }),
                }
           } else {
                return {

@@ -7,7 +7,7 @@ async function handleMemberInvites(): Promise<HttpResponseInit> {
           const members = await medallionPagination<{
                user: { email: string }
                id: string
-          }>('/organizations/members')
+          }>('https://app.medallion.co/p/api/v1/organizations/members/')
           const filtered = members.filter(
                (m) => !m.user.email.includes('sunrise')
           )
