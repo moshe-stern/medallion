@@ -1,6 +1,4 @@
-import { ApiV1OrgProvidersListProvidersResponse200 } from '@api/medallion-api/types'
 import medallionApi from '@api/medallion-api'
-import { FetchResponse } from 'api/dist/core'
 import { Enrollment } from '../../types'
 
 async function getExistingEnrollmentsRequests(
