@@ -1,6 +1,10 @@
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions'
-import { createEnrollments } from '../services/payer-enrollments'
+import {
+     createEnrollments,
+     getMissingEnrollments,
+} from '../services/payer-enrollments'
 import { Enrollment } from '../types'
+import { medallionPagination } from '../services'
 
 async function handlePayerEnrollments(
      request: HttpRequest
@@ -15,11 +19,36 @@ async function handlePayerEnrollments(
                     status: 400,
                }
           }
-          return {
-               status: 200,
-               body: JSON.stringify(
-                    await createEnrollments(data.enrollments, data.state)
-               ),
+          if (request.method === 'POST') {
+               return {
+                    status: 200,
+                    body: JSON.stringify(
+                         await createEnrollments(data.enrollments, data.state)
+                    ),
+               }
+          } else if (request.method === 'GET') {
+               const providers = await medallionPagination<{ id: string }>(
+                    'org/providers',
+                    { state: data.state }
+               )
+               return {
+                    status: 200,
+                    body: JSON.stringify(
+                         await Promise.all(
+                              providers.map((p) =>
+                                   getMissingEnrollments(
+                                        p,
+                                        data.state,
+                                        data.enrollments
+                                   )
+                              )
+                         )
+                    ),
+               }
+          } else {
+               return {
+                    status: 405,
+               }
           }
      } catch (error) {
           return {
@@ -34,7 +63,7 @@ async function handlePayerEnrollments(
 }
 
 app.http('payer-enrollments', {
-     methods: ['POST'],
+     methods: ['POST', 'GET'],
      authLevel: 'function',
      handler: handlePayerEnrollments,
 })

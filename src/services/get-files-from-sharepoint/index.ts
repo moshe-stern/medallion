@@ -4,7 +4,7 @@ const clientSecret = process.env.CLIENT_SECRET!
 const sharepointDomainName = process.env.SHARE_POINT_DOMAIN!
 const resource = process.env.RESOURCE!
 
-async function getAccessToken(): Promise<string> {
+async function getAccessToken(): Promise<string | undefined> {
      const tokenUrl = `https://accounts.accesscontrol.windows.net/${tenantId}/tokens/OAuth/2`
      const data = new URLSearchParams({
           grant_type: 'client_credentials',
@@ -32,11 +32,13 @@ async function getAccessToken(): Promise<string> {
           return responseData.access_token
      } catch (error) {
           console.error('Error fetching access token:', error)
-          throw error
      }
 }
 
-async function getFileContent(url: string, filePath: string): Promise<Blob> {
+async function getFileContent(
+     url: string,
+     filePath: string
+): Promise<Blob | undefined> {
      const token = await getAccessToken()
      const fileUrl = `${url}/_api/web/GetFileByServerRelativeUrl('/${filePath}')/$value`
      try {
@@ -55,7 +57,6 @@ async function getFileContent(url: string, filePath: string): Promise<Blob> {
           return response.blob()
      } catch (error) {
           console.error('Error fetching file:', error)
-          throw error
      }
 }
 

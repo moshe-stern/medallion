@@ -59,23 +59,20 @@ async function updateProviderDocuments(
      const map = providerMap.get(providerDTO.providerId)
      if (!map) return
      const providerDocuments: IProviderDocument[] = await Promise.all(
-          providerDTO.files.map(async (f) => {
-               const id = map.currentDocs.find((d) => d.kind === f.kind)?.id
-               const payload = {
-                    ...f,
-                    id,
-                    providerPk: map.providerId,
-                    fileContent:
-                         (!id &&
-                              (await getFileContent(
-                                   'https://attainaba.sharepoint.com/sites/bi',
-                                   'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
-                                        f.path
-                              ))) ||
-                         undefined,
-               }
-               return payload
-          })
+          providerDTO.files
+               .filter((f) => !map.currentDocs.find((d) => d.kind === f.kind))
+               .map(async (f) => {
+                    const payload = {
+                         ...f,
+                         providerPk: map.providerId,
+                         fileContent: await getFileContent(
+                              'https://attainaba.sharepoint.com/sites/bi',
+                              'sites/bi/Shared Documents/Power Automate/Medallion/Paycom-Documents/' +
+                                   f.path
+                         ),
+                    }
+                    return payload
+               })
      )
      const res = await Promise.all(
           providerDocuments.map((d) => uploadProviderDocument(d))
@@ -84,14 +81,19 @@ async function updateProviderDocuments(
 }
 
 async function getCurrentProviderDocuments(providerId: string) {
-     const res =
-          await medallionApi.api_v1_org_providers_documents_list_providerDocuments(
-               { provider_pk: providerId }
-          )
-     return (res.data.results || []).map((d) => ({
-          kind: d.kind,
-          id: d.id,
-     }))
+     try {
+          const res =
+               await medallionApi.api_v1_org_providers_documents_list_providerDocuments(
+                    { provider_pk: providerId }
+               )
+          return (res.data.results || []).map((d) => ({
+               kind: d.kind,
+               id: d.id,
+          }))
+     } catch (error) {
+          console.error(error)
+          return []
+     }
 }
 
 async function handleProviderDocumentsUpload(

@@ -1,7 +1,7 @@
 import medallionApi from '@api/medallion-api'
 import { ApiV1OrgProvidersListProvidersMetadataParam } from '@api/medallion-api/types'
 import { Enrollment } from '../../types'
-import { getExistingEnrollments } from './enrollment-helpers'
+import { getExistingEnrollmentsRequests } from './enrollment-helpers'
 import { enrollmentAndPracticePromise } from './enrollment-practice-promise'
 import { getGroupProfileIdByName } from '../group-profiles'
 import { createNonExistentPracticesInProvidersForEnrollments } from '../practices'
@@ -15,7 +15,10 @@ async function createEnrollments(enrollments: Enrollment[], state: string) {
      })
      const providers = res.data.results
      if (!providers?.length) throw new Error('Providers not found in State')
-     const existingEnrollments = await getExistingEnrollments(providers, state)
+     const existingEnrollments = await getExistingEnrollmentsRequests(
+          providers,
+          state
+     )
      const businesses = await getLinesOfBusiness()
      const enrollmentData = async (e: Enrollment) => {
           return {
